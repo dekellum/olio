@@ -7,7 +7,7 @@ extern crate test;
 extern crate olio;
 extern crate bytes;
 
-use olio::GatheringReader;
+use olio::io::GatheringReader;
 use bytes::Bytes;
 use test::Bencher;
 use std::io;
