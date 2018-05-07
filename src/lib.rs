@@ -11,6 +11,15 @@
 /// The crate version string.
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Filesystem extensions and utilities.
+pub mod fs {
+    /// Shared reference counted File extensions and utilities.
+    pub mod rc {
+        /// Read-only extensions and utilities.
+        pub mod read;
+    }
+}
+
 /// I/O extensions and utilities
 pub mod io {
     mod gather;

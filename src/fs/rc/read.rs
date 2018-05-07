@@ -216,7 +216,7 @@ impl ReadSlice {
     /// Return a new read-only memory map handle `Mmap` for the complete
     /// region of the underlying file, from start to end.
     #[cfg(feature = "memmap")]
-    pub(crate) fn mem_map(&self) -> Result<Mmap, io::Error> {
+    pub fn mem_map(&self) -> Result<Mmap, io::Error> {
         let offset = self.start;
         let len = self.len();
         // See: https://github.com/danburkert/memmap-rs/pull/65
@@ -376,7 +376,8 @@ impl Seek for ReadSlice {
 mod tests {
     use std::io::{BufReader, Read, Write};
     use std::thread;
-    use ::tempfile::tempfile;
+    extern crate tempfile;
+    use self::tempfile::tempfile;
     use super::*;
 
     #[test]
