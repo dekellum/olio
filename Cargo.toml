@@ -12,8 +12,7 @@ categories    = ["filesystem"]
 exclude       = [
     ".gitignore",
     ".travis.yml",
-    "deploy.sh",
-    "barc/*",
+    "appveyor.yml",
 ]
 
 [badges]
