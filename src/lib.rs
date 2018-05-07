@@ -1,5 +1,5 @@
-//! This crate provides various I/O utilities arranged in a similar way as the
-//! rust std.
+//! This crate provides I/O-related utilities complimenting the Rust Standard
+//! Library `std::io`, `std::fs`, etc.
 //!
 //! ## Optional Features
 //!
@@ -13,7 +13,7 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Filesystem extensions and utilities.
 pub mod fs {
-    /// Shared reference counted File extensions and utilities.
+    /// Shared, reference counted `File` extensions and utilities.
     pub mod rc {
         /// Read-only extensions and utilities.
         pub mod read;

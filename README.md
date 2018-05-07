@@ -5,8 +5,8 @@
 [![Travis CI Build](https://travis-ci.org/dekellum/olio.svg?branch=master)](https://travis-ci.org/dekellum/olio)
 [![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/0c2e9x4inktasxgf?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
 
-Provides I/O-related utilities complimenting and arranged similarly to
-the rust standard library.
+Provides I/O-related utilities complimenting the Rust Standard Library
+`std::io`, `std::fs`, etc.
 
 ## License
 
