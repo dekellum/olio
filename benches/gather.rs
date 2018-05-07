@@ -8,7 +8,7 @@ extern crate olio;
 extern crate bytes;
 
 use olio::io::GatheringReader;
-use bytes::Bytes;
+use bytes::{BufMut, Bytes, BytesMut};
 use test::Bencher;
 use std::io;
 use std::io::{Cursor, Read};
@@ -35,6 +35,39 @@ fn gather_chained_cursors(b: &mut Bencher) {
     })
 }
 
+#[bench]
+fn gather_upfront(b: &mut Bencher) {
+    let buffers = {
+        let mut bufs = Vec::with_capacity(CHUNK_COUNT);
+        for b in create_buffers() {
+            bufs.push(b)
+        }
+        bufs
+    };
+    b.iter( || {
+        let buf = gather(&buffers);
+        let cur = Cursor::new(&buf);
+        let len = read_to_end(cur).expect("read");
+        assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
+    })
+}
+
+#[bench]
+fn gather_upfront_read_only(b: &mut Bencher) {
+    let buf = {
+        let mut buffers = Vec::with_capacity(CHUNK_COUNT);
+        for b in create_buffers() {
+            buffers.push(b)
+        }
+        gather(&buffers)
+    };
+    b.iter( || {
+        let cur = Cursor::new(&buf);
+        let len = read_to_end(cur).expect("read");
+        assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
+    })
+}
+
 fn create_buffers() -> Vec<Bytes> {
     let chunk = vec![65u8; CHUNK_SIZE];
     let mut v = Vec::new();
@@ -42,6 +75,14 @@ fn create_buffers() -> Vec<Bytes> {
         v.push(chunk.as_slice().into());
     }
     v
+}
+
+fn gather(buffers: &Vec<Bytes>) -> Bytes {
+    let mut newb = BytesMut::with_capacity(CHUNK_SIZE * CHUNK_COUNT);
+    for b in buffers {
+        newb.put_slice(&b);
+    }
+    newb.freeze()
 }
 
 fn read_gathered(buffers: &[Bytes]) -> Result<usize, io::Error> {
