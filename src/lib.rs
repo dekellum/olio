@@ -3,8 +3,8 @@
 //!
 //! ## Optional Features
 //!
-//! _memmap (default):_ Adds `fs::rc::read::ReadSlice::mem_map` support for
-//! memory mapping
+//! _memmap (default):_ Adds `fs::rc::ReadSlice::mem_map` support for memory
+//! mapping.
 
 #[cfg(feature = "memmap")] extern crate memmap;
 
@@ -13,10 +13,14 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Filesystem extensions and utilities.
 pub mod fs {
+
+    mod pos_read;
+    pub use fs::pos_read::PosRead;
+
     /// Shared, reference counted `File` extensions and utilities.
     pub mod rc {
-        /// Read-only extensions and utilities.
-        pub mod read;
+        mod read;
+        pub use fs::rc::read::{ReadPos, ReadSlice};
     }
 }
 

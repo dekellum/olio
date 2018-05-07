@@ -1,6 +1,4 @@
-//! Utilities for position independent file access.
-//!
-//! The `PosRead` trait offers a uniform `pread` for positioned reads.
+//! Read-only, shared, reference counted `File` extensions and utilities.
 //!
 //! The `ReadPos` and `ReadSlice` types support multiple independent instance
 //! positions over a shared `File`, without needing a path to open an
@@ -14,26 +12,10 @@ use std::io;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
 use std::sync::Arc;
 
-#[cfg(unix)]
-use std::os::unix::fs::FileExt;
-
-#[cfg(windows)]
-use std::os::windows::fs::FileExt;
+use fs::PosRead;
 
 #[cfg(feature = "memmap")]
 use memmap::{Mmap, MmapOptions};
-
-/// Trait offering a uniform `pread` for positioned reads, with platform
-/// dependent side-effects.
-pub trait PosRead {
-    /// Read some bytes, starting at the specified offset, into the specified
-    /// buffer and return the number of bytes read. The offset is from the
-    /// start of the underlying file or file range.  The position of the
-    /// underlying file pointer (aka cursor) is not used. It is platform
-    /// dependent whether the underlying file pointer is modified by this
-    /// operation.
-    fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
-}
 
 /// Re-implements `Read` and `Seek` over a shared `File` reference using
 /// _only_ positioned reads, and by maintaining an instance independent
@@ -75,20 +57,6 @@ pub struct ReadSlice {
     pos: u64,
     end: u64,
     file: Arc<File>,
-}
-
-impl PosRead for File {
-    #[cfg(unix)]
-    #[inline]
-    fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
-        self.read_at(buf, offset)
-    }
-
-    #[cfg(windows)]
-    #[inline]
-    fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
-        self.seek_read(buf, offset)
-    }
 }
 
 impl ReadPos {
