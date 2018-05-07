@@ -1,20 +1,14 @@
 [package]
-name          = "body-image"
-version       = "0.2.0"
+name          = "olio"
+version       = "0.1.0"
 authors       = ["David Kellum <dek-oss@gravitext.com>"]
 license       = "MIT/Apache-2.0"
-description   = "Adaptive RAM/file-backed HTTP bodies and BARC serialization."
-documentation = "https://docs.rs/body-image"
-repository    = "https://github.com/dekellum/body-image"
+description   = "Miscellaneous I/O utilities"
+documentation = "https://docs.rs/olio"
+repository    = "https://github.com/dekellum/olio"
 readme        = "README.md"
-keywords      = [
-    "buffer", "compression",
-    "http", "serialization", "hyper",
-]
-categories    = [
-    "web-programming::http-client",
-    "web-programming::http-server",
-]
+keywords      = ["file", "fs", "io"]
+categories    = ["filesystem"]
 exclude       = [
     ".gitignore",
     ".travis.yml",
@@ -23,41 +17,20 @@ exclude       = [
 ]
 
 [badges]
-travis-ci = { repository = "dekellum/body-image" }
+travis-ci = { repository = "dekellum/olio" }
 
 [dependencies]
-brotli     = { version = ">=1.2.0, <2", optional = true }
-bytes      = ">=0.4.6, <2"
-clap       = { version = ">=2.31.2, <3", optional = true, default-features = false, features = ["wrap_help"] }
-failure    = ">=0.1.0, <2"
-fern       = { version = ">=0.5.5, <2", optional = true }
-flate2     = ">=1.0.1, <2"
-futures    = { version = ">=0.1.18, <0.2", optional = true }
-http       = ">=0.1.4, <2"
-httparse   = ">=1.2.4, <2"
-hyper      = { version = ">=0.11.22, <0.12.0", optional = true, features = ["compat"] }
-hyper-tls  = { version = ">=0.1.2, <0.2", optional = true }
-log        = ">=0.4.0, <2"
 memmap     = { version = ">=0.6.2, <2", optional = true }
+
+[dev-dependencies]
+bytes      = ">=0.4.6, <2"
 tempfile   = ">=2.2.0, <4"
-tokio-core = { version = ">=0.1.13, <2", optional = true }
 
 [features]
-default = ["memmap", "brotli", "cli"]
-client = ["futures", "hyper", "hyper-tls", "tokio-core"]
-cli = ["fern", "clap"]
+default = ["memmap"]
 
 [lib]
 doctest = false
 
-[[bin]]
-name = "barc"
-path = "src/main.rs"
-test = false
-doctest = false
-bench = false
-doc = false
-required-features = ["cli"]
-
 [package.metadata.docs.rs]
-features = ["memmap", "brotli", "client"]
+features = ["memmap"]
