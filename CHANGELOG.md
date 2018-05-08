@@ -1,3 +1,6 @@
+## 0.2.0 (2018-5-8)
+* Add _mmap_ as "meta" feature over _memmap_.
+
 ## 0.1.0 (2018-5-7)
 * Initial release, extracted from body-image crate by the same author,
   with additional changes listed below.
