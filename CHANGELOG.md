@@ -19,9 +19,9 @@
   ```
 
   Where `gather_chained_cursors` uses standard `Cursor` `Read::chain`
-  over each buffer and demonstrated the need for the custom
+  over each buffer and demonstrates the need for the custom
   `GatheringReader` in `gather_reader`.  Benchmark `gather_upfront`
-  includes timing the `BodyImage::gather` call before a single Cursor
+  includes timing the gather operation before a single Cursor
   based read, and `gather_upfront_read_only` only times the same
   Cursor based read.  Particular CPU/RAM bandwidth, CPU cache size,
   body size and concurrency may all effect the relative performance of
