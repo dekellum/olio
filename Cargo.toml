@@ -26,10 +26,11 @@ bytes      = ">=0.4.6, <2"
 tempfile   = ">=2.2.0, <4"
 
 [features]
-default = ["memmap"]
+default = ["mmap"]
+mmap = ["memmap"]
 
 [lib]
 doctest = false
 
 [package.metadata.docs.rs]
-features = ["memmap"]
+features = ["mmap"]

@@ -3,10 +3,10 @@
 //!
 //! ## Optional Features
 //!
-//! _memmap (default):_ Adds `fs::rc::ReadSlice::mem_map` support for memory
+//! _mmap (default):_ Adds `fs::rc::ReadSlice::mem_map` support for memory
 //! mapping.
 
-#[cfg(feature = "memmap")] extern crate memmap;
+#[cfg(feature = "mmap")] extern crate memmap;
 
 /// The crate version string.
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -14,7 +14,7 @@ use std::sync::Arc;
 
 use fs::PosRead;
 
-#[cfg(feature = "memmap")]
+#[cfg(feature = "mmap")]
 use memmap::{Mmap, MmapOptions};
 
 /// Re-implements `Read` and `Seek` over a shared `File` reference using
@@ -183,7 +183,7 @@ impl ReadSlice {
 
     /// Return a new read-only memory map handle `Mmap` for the complete
     /// region of the underlying file, from start to end.
-    #[cfg(feature = "memmap")]
+    #[cfg(feature = "mmap")]
     pub fn mem_map(&self) -> Result<Mmap, io::Error> {
         let offset = self.start;
         let len = self.len();
