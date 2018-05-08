@@ -45,7 +45,8 @@ fn gather_upfront(b: &mut Bencher) {
         bufs
     };
     b.iter( || {
-        let buf = gather(&buffers);
+        let buffers = buffers.clone(); // shallow
+        let buf = gather(buffers);
         let cur = Cursor::new(&buf);
         let len = read_to_end(cur).expect("read");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
@@ -59,7 +60,7 @@ fn gather_upfront_read_only(b: &mut Bencher) {
         for b in create_buffers() {
             buffers.push(b)
         }
-        gather(&buffers)
+        gather(buffers)
     };
     b.iter( || {
         let cur = Cursor::new(&buf);
@@ -77,10 +78,11 @@ fn create_buffers() -> Vec<Bytes> {
     v
 }
 
-fn gather(buffers: &Vec<Bytes>) -> Bytes {
+fn gather(buffers: Vec<Bytes>) -> Bytes {
     let mut newb = BytesMut::with_capacity(CHUNK_SIZE * CHUNK_COUNT);
     for b in buffers {
         newb.put_slice(&b);
+        drop::<Bytes>(b); // Ensure ASAP drop
     }
     newb.freeze()
 }
