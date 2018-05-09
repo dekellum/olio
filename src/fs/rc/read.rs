@@ -1,12 +1,3 @@
-//! Read-only, shared, reference counted `File` extensions and utilities.
-//!
-//! The `ReadPos` and `ReadSlice` types support multiple independent instance
-//! positions over a shared `File`, without needing a path to open an
-//! independent new `File` instance.  Thus they are compatible with "unnamed"
-//! (not linked) temporary files, and can reduce the number of necessary file
-//! handles.  Note that unix `dup`/`dup2` and the standard `File::try_clone`
-//! do _not_ provide independent file positions.
-
 use std::fs::File;
 use std::io;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
