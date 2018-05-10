@@ -12,6 +12,8 @@
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Filesystem extensions and utilities.
+///
+/// The `PosRead` trait offers a uniform `pread` for positioned reads.
 pub mod fs {
 
     mod pos_read;

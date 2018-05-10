@@ -1,7 +1,3 @@
-//! Read-only filesystem extensions and utilities.
-//!
-//! The `PosRead` trait offers a uniform `pread` for positioned reads.
-
 use std::fs::File;
 use std::io;
 
