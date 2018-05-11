@@ -40,9 +40,10 @@ impl<'a, T: AsRef<[u8]> + 'a> Read for GatheringReader<'a, T> {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let n = self.current.read(buf)?;
         if n == 0 && !buf.is_empty() && self.pop() {
-            return self.read(buf); // recurse
+            self.read(buf) // recurse
+        } else {
+            Ok(n)
         }
-        Ok(n)
     }
 }
 
