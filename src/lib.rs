@@ -3,7 +3,7 @@
 //!
 //! ## Optional Features
 //!
-//! _mmap (default):_ Adds `fs::rc::ReadSlice::mem_map` support for memory
+//! _mmap (default):_ Adds `fs::ReadSlice::mem_map` support for memory
 //! mapping.
 
 #[cfg(feature = "mmap")] extern crate memmap;
@@ -28,7 +28,7 @@ pub mod fs {
     mod read;
     pub use fs::read::{ReadPos, ReadSlice, ReadSubSlice};
 
-    /// Compatiblity types.
+    /// Compatibility type aliases.
     pub mod rc {
         use std::fs::File;
         use std::sync::Arc;

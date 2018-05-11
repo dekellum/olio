@@ -12,7 +12,8 @@ use memmap::{Mmap, MmapOptions};
 /// reads, and by maintaining an instance independent position.
 ///
 /// The type is generic over `Borrow<File>`, so it can own a `File` via
-/// `ReadPos<File>` or use a shared reference, like `ReadPos<Arc<File>>`.
+/// `ReadPos<File>` or use a shared reference, like `ReadPos<&File>` or
+/// `ReadPos<Arc<File>>`.
 ///
 /// A fixed `length` is passed on construction and used solely to interpret
 /// `SeekFrom::End`. Reads are not constrained by this length. The length is
@@ -34,7 +35,8 @@ where T: Borrow<File>
 /// reads, and by maintaining instance independent start, end, and position.
 ///
 /// The type is generic over `Borrow<File>`, so it can own a `File` via
-/// `ReadSlice<File>` or use a shared reference, like `ReadSlice<Arc<File>>`.
+/// `ReadSlice<File>` or use a shared reference, like `ReadSlice<&File>` or
+/// `ReadSlice<Arc<File>>`.
 ///
 /// As compared with [`ReadPos`](struct.ReadPos.html), `ReadSlice` adds a
 /// general start offset, and limits access to the start..end range. Seeks are
@@ -509,7 +511,7 @@ mod tests {
         let mut f = tempfile().unwrap();
         f.write_all(b"012345678901").unwrap();
 
-        let r1 = ReadSlice::new(Arc::new(f), 1, 12);
+        let r1 = ReadSlice::new(&f, 1, 12);
         let mut r1 = r1.subslice(0, 10);
 
         let mut buf = [0u8; 5];
