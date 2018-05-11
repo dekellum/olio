@@ -29,7 +29,7 @@ pub mod fs {
     /// do _not_ provide independent file positions.
     pub mod rc {
         mod read;
-        pub use fs::rc::read::{ReadPos, ReadSlice};
+        pub use fs::rc::read::{ReadPos, ReadSlice, ReadSubSlice};
     }
 }
 

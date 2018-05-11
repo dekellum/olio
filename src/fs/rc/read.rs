@@ -1,16 +1,18 @@
+use std::borrow::Borrow;
 use std::fs::File;
 use std::io;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
-use std::sync::Arc;
 
 use fs::PosRead;
 
 #[cfg(feature = "mmap")]
 use memmap::{Mmap, MmapOptions};
 
-/// Re-implements `Read` and `Seek` over a shared `File` reference using
-/// _only_ positioned reads, and by maintaining an instance independent
-/// position.
+/// Re-implements `Read` and `Seek` over a `File` using _only_ positioned
+/// reads, and by maintaining an instance independent position.
+///
+/// The type is generic over `Borrow<File>`, so it can own a `File` via
+/// `ReadPos<File>` or use a shared reference, like `ReadPos<Arc<File>>`.
 ///
 /// A fixed `length` is passed on construction and used solely to interpret
 /// `SeekFrom::End`. Reads are not constrained by this length. The length is
@@ -20,15 +22,19 @@ use memmap::{Mmap, MmapOptions};
 /// length. Seeking past the end is allowed by the platforms for `File`, and
 /// is also allowed for `ReadPos`.
 #[derive(Debug)]
-pub struct ReadPos {
+pub struct ReadPos<T>
+where T: Borrow<File>
+{
     pos: u64,
     length: u64,
-    file: Arc<File>,
+    file: T,
 }
 
-/// Re-implements `Read` and `Seek` over a shared `File` reference using
-/// _only_ positioned reads, and by maintaining instance independent start,
-/// end, and position.
+/// Re-implements `Read` and `Seek` over a `File` using _only_ positioned
+/// reads, and by maintaining instance independent start, end, and position.
+///
+/// The type is generic over `Borrow<File>`, so it can own a `File` via
+/// `ReadSlice<File>` or use a shared reference, like `ReadSlice<Arc<File>>`.
 ///
 /// As compared with [`ReadPos`](struct.ReadPos.html), `ReadSlice` adds a
 /// general start offset, and limits access to the start..end range. Seeks are
@@ -43,17 +49,30 @@ pub struct ReadPos {
 /// `File` will return 0 length. Seeking past the end is allowed by the
 /// platforms for `File`, and is also allowed for `ReadSlice`.
 #[derive(Debug)]
-pub struct ReadSlice {
+pub struct ReadSlice<T>
+where T: Borrow<File>
+{
     start: u64,
     pos: u64,
     end: u64,
-    file: Arc<File>,
+    file: T,
 }
 
-impl ReadPos {
+/// Trait for types than can be (sub)sliced to `ReadSlice<T>`
+pub trait ReadSubSlice<T>
+where T: Borrow<File>
+{
+    /// Return a new and independent `ReadSlice` for the same file, for the
+    /// range of byte offsets `start..end`.
+    fn subslice(&self, start: u64, end: u64) -> ReadSlice<T>;
+}
+
+impl<T> ReadPos<T>
+where T: Borrow<File>
+{
     /// New instance by `File` reference and fixed file length. The initial
     /// position is the start of the file.
-    pub fn new(file: Arc<File>, length: u64) -> ReadPos {
+    pub fn new(file: T, length: u64) -> Self {
         ReadPos { pos: 0, length, file }
     }
 
@@ -66,14 +85,6 @@ impl ReadPos {
     /// Return `true` if length is 0.
     pub fn is_empty(&self) -> bool {
         self.length == 0
-    }
-
-    /// Return a new and independent `ReadSlice` for the same file, for the
-    /// range of byte offsets `start..end`. _Panics_ if start is greater than
-    /// end. Note that the end parameter is not checked against the length of
-    /// self as passed on construction.
-    pub fn subslice(&self, start: u64, end: u64) -> ReadSlice {
-        ReadSlice::new(self.file.clone(), start, end)
     }
 
     /// Return the current instance position. This is a convenience shorthand
@@ -109,23 +120,29 @@ impl ReadPos {
     }
 }
 
-impl Clone for ReadPos {
+impl<T> Clone for ReadPos<T>
+where T: Borrow<File> + Clone
+{
     /// Return a new, independent `ReadPos` with the same length and file
     /// reference as self, and with position 0 (ignores the current
     /// position of self).
-    fn clone(&self) -> ReadPos {
+    fn clone(&self) -> Self {
         ReadPos { pos: 0, length: self.length, file: self.file.clone() }
     }
 }
 
-impl PosRead for ReadPos {
+impl<T> PosRead for ReadPos<T>
+where T: Borrow<File>
+{
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
-        self.file.pread(buf, offset)
+        self.file.borrow().pread(buf, offset)
     }
 }
 
-impl Read for ReadPos {
+impl<T> Read for ReadPos<T>
+where T: Borrow<File>
+{
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let len = self.pread(buf, self.pos)?;
@@ -134,7 +151,9 @@ impl Read for ReadPos {
     }
 }
 
-impl Seek for ReadPos {
+impl<T> Seek for ReadPos<T>
+where T: Borrow<File>
+{
     fn seek(&mut self, from: SeekFrom) -> io::Result<u64> {
         match from {
             SeekFrom::Start(p) => {
@@ -153,10 +172,25 @@ impl Seek for ReadPos {
     }
 }
 
-impl ReadSlice {
+impl<T> ReadSubSlice<T> for ReadPos<T>
+where T: Borrow<File> + Clone
+{
+    /// Return a new and independent `ReadSlice` for the same file, for the
+    /// range of byte offsets `start..end`. This implementation _panics_ if
+    /// start is greater than end. Note that the end parameter is not checked
+    /// against the length of self as passed on construction.
+    fn subslice(&self, start: u64, end: u64) -> ReadSlice<T>
+    {
+        ReadSlice::new(self.file.clone(), start, end)
+    }
+}
+
+impl<T> ReadSlice<T>
+where T: Borrow<File>
+{
     /// New instance by `File` reference, fixed start and end offsets. The
     /// initial position is at the start (relative offset 0).
-    pub fn new(file: Arc<File>, start: u64, end: u64) -> ReadSlice {
+    pub fn new(file: T, start: u64, end: u64) -> Self {
         assert!(start <= end);
         ReadSlice { start, pos: start, end, file }
     }
@@ -187,24 +221,8 @@ impl ReadSlice {
             MmapOptions::new()
                 .offset(offset as usize)
                 .len(len as usize)
-                .map(&self.file)
+                .map(self.file.borrow())
         }
-    }
-
-    /// Return a new and independent `ReadSlice` on the same file, for the
-    /// range of byte offsets `start..end` which are relative to, and must be
-    /// fully contained by self. _Panics_ on overflow, if start..end is not
-    /// fully contained, or if start is greater-than end.
-    pub fn subslice(&self, start: u64, end: u64) -> ReadSlice {
-        let abs_start = self.start.checked_add(start)
-            .expect("ReadSlice::subslice start overflow");
-        let abs_end = self.start.checked_add(end)
-            .expect("ReadSlice::subslice end overflow");
-        assert!(abs_start  <= abs_end);
-        assert!(self.start <= abs_start);
-        assert!(self.end   >= abs_end);
-
-        ReadSlice::new(self.file.clone(), abs_start, abs_end)
     }
 
     /// Return the current instance position, relative to the slice. This is a
@@ -220,10 +238,10 @@ impl ReadSlice {
         if abspos < self.end {
             let mlen = self.end - abspos; // positive/no-underflow per above
             if (buf.len() as u64) <= mlen {
-                self.file.pread(buf, abspos)
+                self.file.borrow().pread(buf, abspos)
             } else {
                 // safe cast: mlen < buf.len which is already usize
-                self.file.pread(&mut buf[..(mlen as usize)], abspos)
+                self.file.borrow().pread(&mut buf[..(mlen as usize)], abspos)
             }
         } else {
             Ok(0)
@@ -271,11 +289,13 @@ impl ReadSlice {
     }
 }
 
-impl Clone for ReadSlice {
+impl<T> Clone for ReadSlice<T>
+where T: Borrow<File> + Clone
+{
     /// Return a new, independent `ReadSlice` with the same start, end and
     /// file reference as self, and positioned at start (ignores the current
     /// position of self).
-    fn clone(&self) -> ReadSlice {
+    fn clone(&self) -> Self {
         ReadSlice { start: self.start,
                     pos:   self.start,
                     end:   self.end,
@@ -283,7 +303,9 @@ impl Clone for ReadSlice {
     }
 }
 
-impl PosRead for ReadSlice {
+impl<T> PosRead for ReadSlice<T>
+where T: Borrow<File>
+{
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
         let pos = self.start.saturating_add(offset);
@@ -295,7 +317,9 @@ impl PosRead for ReadSlice {
     }
 }
 
-impl Read for ReadSlice {
+impl<T> Read for ReadSlice<T>
+where T: Borrow<File>
+{
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let len = self.pread_abs(buf, self.pos)?;
@@ -304,7 +328,9 @@ impl Read for ReadSlice {
     }
 }
 
-impl Seek for ReadSlice {
+impl<T> Seek for ReadSlice<T>
+where T: Borrow<File>
+{
     /// Seek to an offset, in bytes, in a stream. In this implementation,
     /// seeks are relative to the fixed starting offset to underlying File, so
     /// a seek to `SeekFrom::Start(0)` is always the first byte of the slice.
@@ -332,9 +358,30 @@ impl Seek for ReadSlice {
     }
 }
 
+impl<T> ReadSubSlice<T> for ReadSlice<T>
+where T: Borrow<File> + Clone
+{
+    /// Return a new and independent `ReadSlice` on the same file, for the
+    /// range of byte offsets `start..end` which are relative to, and must be
+    /// fully contained by self. This implemntation _panics_ on overflow, if
+    /// start..end is not fully contained, or if start is greater-than end.
+    fn subslice(&self, start: u64, end: u64) -> Self {
+        let abs_start = self.start.checked_add(start)
+            .expect("ReadSlice::subslice start overflow");
+        let abs_end = self.start.checked_add(end)
+            .expect("ReadSlice::subslice end overflow");
+        assert!(abs_start  <= abs_end);
+        assert!(self.start <= abs_start);
+        assert!(self.end   >= abs_end);
+
+        ReadSlice::new(self.file.clone(), abs_start, abs_end)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::io::{BufReader, Read, Write};
+    use std::sync::Arc;
     use std::thread;
     extern crate tempfile;
     use self::tempfile::tempfile;
@@ -345,7 +392,7 @@ mod tests {
         let mut f = tempfile().unwrap();
         f.write_all(b"1234567890").unwrap();
 
-        let mut r1 = ReadPos::new(Arc::new(f), 10);
+        let mut r1 = ReadPos::new(f, 10);
         let mut buf = [0u8; 5];
 
         let p = r1.seek(SeekFrom::Current(0)).unwrap();
@@ -439,7 +486,7 @@ mod tests {
         let mut f = tempfile().unwrap();
         f.write_all(b"1234567890").unwrap();
 
-        let mut r1 = ReadSlice::new(Arc::new(f), 0, 10);
+        let mut r1 = ReadSlice::new(f, 0, 10);
         let mut buf = [0u8; 5];
 
         let p = r1.seek(SeekFrom::Current(0)).unwrap();
@@ -508,9 +555,20 @@ mod tests {
 
     #[test]
     fn test_send_sync() {
-        assert!(is_send::<ReadPos>());
-        assert!(is_sync::<ReadPos>());
-        assert!(is_send::<ReadSlice>());
-        assert!(is_sync::<ReadSlice>());
+        assert!(is_send::<ReadPos<File>>());
+        assert!(is_sync::<ReadPos<File>>());
+        assert!(is_send::<ReadPos<Arc<File>>>());
+        assert!(is_sync::<ReadPos<Arc<File>>>());
+        assert!(is_send::<ReadSlice<Arc<File>>>());
+        assert!(is_sync::<ReadSlice<Arc<File>>>());
+    }
+
+    fn is_pos_read<T: PosRead>() -> bool { true }
+
+    #[test]
+    fn test_generic_bounds() {
+        assert!(is_pos_read::<ReadPos<File>>());
+        assert!(is_pos_read::<ReadPos<Box<File>>>());
+        assert!(is_pos_read::<ReadPos<&File>>());
     }
 }
