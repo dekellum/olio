@@ -69,8 +69,9 @@ impl ReadPos {
     }
 
     /// Return a new and independent `ReadSlice` for the same file, for the
-    /// range of byte offsets `start..end`. Panics if start is greater than
-    /// end. Note that end is not checked against the constructed length.
+    /// range of byte offsets `start..end`. _Panics_ if start is greater than
+    /// end. Note that the end parameter is not checked against the length of
+    /// self as passed on construction.
     pub fn subslice(&self, start: u64, end: u64) -> ReadSlice {
         ReadSlice::new(self.file.clone(), start, end)
     }
@@ -192,8 +193,8 @@ impl ReadSlice {
 
     /// Return a new and independent `ReadSlice` on the same file, for the
     /// range of byte offsets `start..end` which are relative to, and must be
-    /// fully contained by self. Checks for and panics on overflow, if
-    /// start..end is not fully contained, or if start is greater-than end.
+    /// fully contained by self. _Panics_ on overflow, if start..end is not
+    /// fully contained, or if start is greater-than end.
     pub fn subslice(&self, start: u64, end: u64) -> ReadSlice {
         let abs_start = self.start.checked_add(start)
             .expect("ReadSlice::subslice start overflow");
