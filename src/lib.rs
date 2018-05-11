@@ -33,11 +33,11 @@ pub mod fs {
         use std::fs::File;
         use std::sync::Arc;
 
-        /// Use the full generic form in instead.
+        /// Use the full generic form instead.
         #[deprecated]
         pub type ReadPos = super::ReadPos<Arc<File>>;
 
-        /// Use the full generic form in instead.
+        /// Use the full generic form instead.
         #[deprecated]
         pub type ReadSlice = super::ReadSlice<Arc<File>>;
     }

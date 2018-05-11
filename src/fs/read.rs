@@ -58,11 +58,11 @@ where T: Borrow<File>
     file: T,
 }
 
-/// Trait for types than can be (sub)sliced to `ReadSlice<T>`
+/// Trait for types that can be (sub-)sliced to `ReadSlice<T>`.
 pub trait ReadSubSlice<T>
 where T: Borrow<File>
 {
-    /// Return a new and independent `ReadSlice` for the same file, for the
+    /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end`.
     fn subslice(&self, start: u64, end: u64) -> ReadSlice<T>;
 }
@@ -175,7 +175,7 @@ where T: Borrow<File>
 impl<T> ReadSubSlice<T> for ReadPos<T>
 where T: Borrow<File> + Clone
 {
-    /// Return a new and independent `ReadSlice` for the same file, for the
+    /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end`. This implementation _panics_ if
     /// start is greater than end. Note that the end parameter is not checked
     /// against the length of self as passed on construction.
@@ -361,9 +361,9 @@ where T: Borrow<File>
 impl<T> ReadSubSlice<T> for ReadSlice<T>
 where T: Borrow<File> + Clone
 {
-    /// Return a new and independent `ReadSlice` on the same file, for the
+    /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end` which are relative to, and must be
-    /// fully contained by self. This implemntation _panics_ on overflow, if
+    /// fully contained by self. This implementation _panics_ on overflow, if
     /// start..end is not fully contained, or if start is greater-than end.
     fn subslice(&self, start: u64, end: u64) -> Self {
         let abs_start = self.start.checked_add(start)
