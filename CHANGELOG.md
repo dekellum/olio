@@ -1,3 +1,15 @@
+## TBD
+
+* `GatheringReader` benchmark improvements with latest rust nightly:
+
+  dev host; i7-5600U, rustc 1.27.0-nightly (acd3871ba 2018-05-10):
+  ``` text
+  test gather_chained_cursors   ... bench:     540,762 ns/iter (+/- 11,658)
+  test gather_reader            ... bench:      34,323 ns/iter (+/- 7,333)
+  test gather_upfront           ... bench:      45,337 ns/iter (+/- 1,058)
+  test gather_upfront_read_only ... bench:      24,184 ns/iter (+/- 901)
+  ```
+
 ## 0.2.0 (2018-5-8)
 * Add _mmap_ as "meta" feature over _memmap_.
 
