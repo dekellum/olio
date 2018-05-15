@@ -5,7 +5,7 @@ extern crate test;
 extern crate olio;
 extern crate tempfile;
 
-use olio::fs::rc::{ReadPos, ReadSlice};
+use olio::fs::{ReadPos, ReadSlice};
 use test::Bencher;
 use std::fs::File;
 use std::io;
