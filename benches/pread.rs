@@ -9,7 +9,7 @@ use olio::fs::{ReadPos, ReadSlice};
 use test::Bencher;
 use std::fs::File;
 use std::io;
-use std::io::{Read, Seek, SeekFrom, Write};
+use std::io::{BufReader, Cursor, Read, Seek, SeekFrom, Write};
 use std::sync::Arc;
 use tempfile::tempfile;
 
@@ -49,6 +49,37 @@ fn read_all_slice(b: &mut Bencher) {
             0,
             (CHUNK_SIZE * CHUNK_COUNT) as u64
         );
+        let len = read_to_end(&mut rdr).expect("read slice");
+        assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
+    })
+}
+
+#[bench]
+fn read_all_slice_buf(b: &mut Bencher) {
+    let file = Arc::new(create_file().unwrap());
+    b.iter( || {
+        let rs = ReadSlice::<File, _>::new(
+            file.clone(),
+            0,
+            (CHUNK_SIZE * CHUNK_COUNT) as u64
+        );
+        let mut rdr = BufReader::with_capacity(0x8000, rs);
+        let len = read_to_end(&mut rdr).expect("read slice");
+        assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
+    })
+}
+
+#[bench]
+fn read_all_map(b: &mut Bencher) {
+    let file = Arc::new(create_file().unwrap());
+    let rslice = ReadSlice::<File, _>::new(
+        file.clone(),
+        0,
+        (CHUNK_SIZE * CHUNK_COUNT) as u64
+    );
+    let map = rslice.mem_map().expect("mmap");
+    b.iter( || {
+        let mut rdr = Cursor::new(&map);
         let len = read_to_end(&mut rdr).expect("read slice");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
     })
