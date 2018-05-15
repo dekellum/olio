@@ -31,7 +31,7 @@ fn read_all_raw(b: &mut Bencher) {
 fn read_all_pos(b: &mut Bencher) {
     let file = Arc::new(create_file().unwrap());
     b.iter( || {
-        let mut rdr = ReadPos::new(
+        let mut rdr = ReadPos::<File, _>::new(
             file.clone(),
             (CHUNK_SIZE * CHUNK_COUNT) as u64
         );
@@ -44,7 +44,7 @@ fn read_all_pos(b: &mut Bencher) {
 fn read_all_slice(b: &mut Bencher) {
     let file = Arc::new(create_file().unwrap());
     b.iter( || {
-        let mut rdr = ReadSlice::new(
+        let mut rdr = ReadSlice::<File, _>::new(
             file.clone(),
             0,
             (CHUNK_SIZE * CHUNK_COUNT) as u64

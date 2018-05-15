@@ -16,17 +16,20 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 /// The `PosRead` trait offers a uniform `pread` for positioned reads.
 ///
 /// The `ReadPos` and `ReadSlice` types support multiple independent instance
-/// positions over a shared `File`, without needing a path to open an
-/// independent new `File` instance.  Thus they are compatible with "unnamed"
-/// (not linked) temporary files, and can reduce the number of necessary file
-/// handles.  Note that unix `dup`/`dup2` and the standard `File::try_clone`
-/// do _not_ provide independent file positions.
+/// positions over a `Borrow` of `File` (or other `PosRead` type), without
+/// needing a path to open an independent new `File` instance.  Thus they are
+/// compatible with "unnamed" (not linked) temporary files, and can reduce the
+/// number of necessary file handles.  Note that unix `dup`/`dup2` and the
+/// standard `File::try_clone` do _not_ provide independent file positions.
 pub mod fs {
     mod pos_read;
     pub use fs::pos_read::PosRead;
 
     mod read;
     pub use fs::read::{ReadPos, ReadSlice, ReadSubSlice};
+
+    #[cfg(feature = "mmap")]
+    pub use fs::read::SliceMemMap;
 
     /// Compatibility type aliases.
     pub mod rc {
@@ -35,11 +38,11 @@ pub mod fs {
 
         /// Use the full generic form instead.
         #[deprecated]
-        pub type ReadPos = super::ReadPos<Arc<File>>;
+        pub type ReadPos = super::ReadPos<File, Arc<File>>;
 
         /// Use the full generic form instead.
         #[deprecated]
-        pub type ReadSlice = super::ReadSlice<Arc<File>>;
+        pub type ReadSlice = super::ReadSlice<File, Arc<File>>;
     }
 }
 
