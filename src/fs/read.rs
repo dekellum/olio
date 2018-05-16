@@ -65,13 +65,14 @@ where P: PosRead, B: Borrow<P>
     phantom: PhantomData<fn() -> P>
 }
 
-/// Types that can be (sub-)sliced to `ReadSlice<T>`.
-pub trait ReadSubSlice<P, B>
-where P: PosRead, B: Borrow<P>
+/// Types that can be (sub-)sliced to a `ReadSlice`.
+pub trait ReadSubSlice
 {
+    type ReadSliceType;
+
     /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end`.
-    fn subslice(&self, start: u64, end: u64) -> ReadSlice<P, B>;
+    fn subslice(&self, start: u64, end: u64) -> Self::ReadSliceType;
 }
 
 impl<P, B> ReadPos<P, B>
@@ -182,15 +183,16 @@ where P: PosRead, B: Borrow<P>
     }
 }
 
-impl<P, B> ReadSubSlice<P, B> for ReadPos<P, B>
+impl<P, B> ReadSubSlice for ReadPos<P, B>
 where P: PosRead, B: Borrow<P> + Clone
 {
+    type ReadSliceType = ReadSlice<P, B>;
+
     /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end`. This implementation _panics_ if
     /// start is greater than end. Note that the end parameter is not checked
     /// against the length of self as passed on construction.
-    fn subslice(&self, start: u64, end: u64) -> ReadSlice<P, B>
-    {
+    fn subslice(&self, start: u64, end: u64) -> Self::ReadSliceType {
         ReadSlice::new(self.file.clone(), start, end)
     }
 }
@@ -351,9 +353,11 @@ where P: PosRead, B: Borrow<P>
     }
 }
 
-impl<P, B> ReadSubSlice<P, B> for ReadSlice<P, B>
+impl<P, B> ReadSubSlice for ReadSlice<P, B>
 where P: PosRead, B: Borrow<P> + Clone
 {
+    type ReadSliceType = Self;
+
     /// Return a new and independent `ReadSlice` of the same file, for the
     /// range of byte offsets `start..end` which are relative to, and must be
     /// fully contained by self. This implementation _panics_ on overflow, if
