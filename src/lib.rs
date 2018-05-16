@@ -74,12 +74,7 @@ pub mod fs {
         use std::fs::File;
         use std::sync::Arc;
 
-        /// Use the full generic form instead.
-        #[deprecated]
         pub type ReadPos = super::ReadPos<File, Arc<File>>;
-
-        /// Use the full generic form instead.
-        #[deprecated]
         pub type ReadSlice = super::ReadSlice<File, Arc<File>>;
     }
 }
