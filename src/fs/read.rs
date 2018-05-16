@@ -376,20 +376,12 @@ where P: PosRead, B: Borrow<P> + Clone
 }
 
 #[cfg(feature = "mmap")]
-/// Types that may be memory mapped (optional _mmap_ feature)
-pub trait SliceMemMap {
-    /// Return a new read-only memory map handle `Mmap` for the complete
-    /// region or slice of an underlying `File`, from start to end.
-    fn mem_map(&self) -> Result<Mmap, io::Error>;
-}
-
-#[cfg(feature = "mmap")]
-impl<B> SliceMemMap for ReadSlice<File, B>
+impl<B> ReadSlice<File, B>
 where B: Borrow<File>
 {
     /// Return a new read-only memory map handle `Mmap` for the complete
     /// region of the underlying `File`, from start to end.
-    fn mem_map(&self) -> Result<Mmap, io::Error> {
+    pub fn mem_map(&self) -> Result<Mmap, io::Error> {
         let offset = self.start;
         let len = self.len();
         // See: https://github.com/danburkert/memmap-rs/pull/65

@@ -28,9 +28,6 @@ pub mod fs {
     mod read;
     pub use fs::read::{ReadPos, ReadSlice, ReadSubSlice};
 
-    #[cfg(feature = "mmap")]
-    pub use fs::read::SliceMemMap;
-
     /// Compatibility type aliases.
     pub mod rc {
         use std::fs::File;
