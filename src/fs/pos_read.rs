@@ -9,8 +9,15 @@ use std::os::windows::fs::FileExt;
 
 /// Trait offering a uniform `pread` for positioned reads, with platform
 /// dependent side-effects.
+///
+/// For `File`, this is implemented using the platform dependent `FileExt`
+/// traits.  To maintain portability and consistency on all platforms, the
+/// user is advised to avoid concurrent, direct reads or writes on a `File`
+/// (via its own `Read`/`Write` implementation) while any instances of this
+/// interface are in use for the same `File`, and to re-`seek` the file
+/// position after such use.
 pub trait PosRead {
-    /// Read some bytes, starting at the specified offset, into the specified
+    /// Read bytes, starting at the specified offset, into the specified
     /// buffer and return the number of bytes read. The offset is from the
     /// start of the underlying file or file range.  The position of the
     /// underlying file pointer (aka cursor) is not used. It is platform

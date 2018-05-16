@@ -38,9 +38,9 @@ where P: PosRead, B: Borrow<P>
 /// reads, and by maintaining instance independent start, end, and position.
 ///
 /// The type is generic over any `PosRead` implementation, and a `Borrow`
-/// type, so for example, it can use can be an owner via `ReadSlice<File, File>` or
-/// use a shared reference, as in `ReadSlice<File, &File>` or
-/// `ReadSlice<File, Arc<File>>`.
+/// type, so for example, it can use can be an owner via
+/// `ReadSlice<File, File>` or use a shared reference, as in
+/// `ReadSlice<File, &File>` or `ReadSlice<File, Arc<File>>`.
 ///
 /// As compared with [`ReadPos`](struct.ReadPos.html), `ReadSlice` adds a
 /// general start offset, and limits access to the start..end range. Seeks are
@@ -65,7 +65,7 @@ where P: PosRead, B: Borrow<P>
     phantom: PhantomData<fn() -> P>
 }
 
-/// Types that can be (sub-)sliced to a `ReadSlice`.
+/// Types that can be subsliced to a `ReadSlice`.
 pub trait ReadSubSlice
 {
     type ReadSliceType;

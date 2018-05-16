@@ -3,7 +3,7 @@
 //!
 //! ## Optional Features
 //!
-//! _mmap (default):_ Adds `fs::ReadSlice::mem_map` support for memory
+//! _mmap (default):_ Adds `fs::ReadSlice::<File, _>::mem_map` support for memory
 //! mapping.
 
 #[cfg(feature = "mmap")] extern crate memmap;
@@ -15,12 +15,53 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 ///
 /// The `PosRead` trait offers a uniform `pread` for positioned reads.
 ///
-/// The `ReadPos` and `ReadSlice` types support multiple independent instance
-/// positions over a `Borrow` of `File` (or other `PosRead` type), without
-/// needing a path to open an independent new `File` instance.  Thus they are
-/// compatible with "unnamed" (not linked) temporary files, and can reduce the
-/// number of necessary file handles.  Note that unix `dup`/`dup2` and the
-/// standard `File::try_clone` do _not_ provide independent file positions.
+/// The `ReadPos` and `ReadSlice` types re-implement `Read` and `Seek` over
+/// any `Borrow` of a `PosRead` type. For `File` in particular, this enables
+/// multiple independent reader instances, without needing a path to open an
+/// independent new `File` instance.  Thus these types are compatible with
+/// "unnamed" (not linked) temporary files, and can reduce the number of
+/// necessary file handles.  Note that unix `dup`/`dup2` and the standard
+/// `File::try_clone` do _not_ provide independent file positions.
+///
+/// ## Example
+///
+/// ``` rust
+/// extern crate olio;
+/// extern crate tempfile;
+///
+/// # use std::io;
+/// use std::fs::File;
+/// use std::io::{Read, Write};
+/// use olio::fs::{ReadPos, ReadSlice, ReadSubSlice};
+/// use tempfile::tempfile;
+///
+/// # fn run() -> Result<(), io::Error> {
+/// let mut file = tempfile()?;
+/// file.write_all(b"0123456789")?;
+///
+/// // ReadPos by &File so that we can subslice by shared reference
+/// let mut rpos = ReadPos::<File, _>::new(&file, 10);
+///
+/// // Read the first half
+/// let mut buf = [0u8; 5];
+/// rpos.read_exact(&mut buf)?;
+/// assert_eq!(&buf, b"01234");
+///
+/// // Create an independent ReadSlice and read to end
+/// let mut rslice = rpos.subslice(2, 7);
+/// let mut buf = Vec::new();
+/// rslice.read_to_end(&mut buf)?;
+/// assert_eq!(&buf, b"23456");
+///
+/// // Read the second half from the original ReadPos
+/// assert_eq!(rpos.tell(), 5);
+/// let mut buf = [0u8; 5];
+/// rpos.read_exact(&mut buf)?;
+/// assert_eq!(&buf, b"56789");
+/// # Ok(())
+/// # }
+/// # run().unwrap();
+/// ```
 pub mod fs {
     mod pos_read;
     pub use fs::pos_read::PosRead;
