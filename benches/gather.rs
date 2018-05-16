@@ -27,7 +27,7 @@ fn gather_reader(b: &mut Bencher) {
 }
 
 #[bench]
-fn gather_chained_cursors(b: &mut Bencher) {
+fn gather_x_chained_cursors(b: &mut Bencher) {
     let buffers = create_buffers();
     b.iter( move || {
         let len = read_chained(&buffers).expect("read");
