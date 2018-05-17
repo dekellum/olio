@@ -1,4 +1,4 @@
-## TBD
+## 0.3.0 (TBD)
 
 * `GatheringReader` benchmark improvements with latest rust nightly:
 

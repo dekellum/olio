@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "olio"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "bytes 0.4.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "memmap 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",

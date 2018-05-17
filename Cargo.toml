@@ -1,6 +1,6 @@
 [package]
 name          = "olio"
-version       = "0.2.0"
+version       = "0.3.0"
 authors       = ["David Kellum <dek-oss@gravitext.com>"]
 license       = "MIT/Apache-2.0"
 description   = "Miscellaneous I/O utilities"
