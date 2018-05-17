@@ -30,7 +30,7 @@ default = ["mmap"]
 mmap = ["memmap"]
 
 [lib]
-doctest = false
+doctest = true
 
 [package.metadata.docs.rs]
 features = ["mmap"]
