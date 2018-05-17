@@ -283,10 +283,10 @@ where P: PosRead + Clone
     /// Return a new, independent `ReadSlice` by clone of the inner `PosRead`,
     /// with the same start and end as self, and positioned at start.
     fn clone(&self) -> Self {
-        ReadSlice { start: self.start,
-                    pos:   self.start,
-                    end:   self.end,
-                    pos_read:  self.pos_read.clone() }
+        ReadSlice { start:    self.start,
+                    pos:      self.start,
+                    end:      self.end,
+                    pos_read: self.pos_read.clone() }
     }
 }
 
