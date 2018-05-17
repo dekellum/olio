@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::fs::File;
 use std::io;
 
@@ -10,12 +11,12 @@ use std::os::windows::fs::FileExt;
 /// Trait offering a uniform `pread` for positioned reads, with platform
 /// dependent side-effects.
 ///
-/// For `File`, this is implemented using the platform dependent `FileExt`
-/// traits.  To maintain portability and consistency on all platforms, the
-/// user is advised to avoid concurrent, direct reads or writes on a `File`
-/// (via its own `Read`/`Write` implementation) while any instances of this
-/// interface are in use for the same `File`, and to re-`seek` the file
-/// position after such use.
+/// For `File` (and any `Borrow<File>`), this is implemented using the
+/// platform dependent standard `FileExt` traits.  To maintain portability and
+/// consistency on all platforms, the user is advised to avoid concurrent,
+/// direct reads or writes on a `File` (via its own `Read`/`Write`
+/// implementation) while any instances of this interface are in use for the
+/// same `File`, and to re-`seek` the file position after such use.
 pub trait PosRead {
     /// Read bytes, starting at the specified offset, into the specified
     /// buffer and return the number of bytes read. The offset is from the
@@ -26,16 +27,18 @@ pub trait PosRead {
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize>;
 }
 
-impl PosRead for File {
+impl<B> PosRead for B
+where B: Borrow<File>
+{
     #[cfg(unix)]
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
-        self.read_at(buf, offset)
+        self.borrow().read_at(buf, offset)
     }
 
     #[cfg(windows)]
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
-        self.seek_read(buf, offset)
+        self.borrow().seek_read(buf, offset)
     }
 }
