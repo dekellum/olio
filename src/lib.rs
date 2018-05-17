@@ -40,7 +40,7 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 /// file.write_all(b"0123456789")?;
 ///
 /// // ReadPos by &File so that we can subslice by shared reference
-/// let mut rpos = ReadPos::<File, _>::new(&file, 10);
+/// let mut rpos = ReadPos::new(&file, 10);
 ///
 /// // Read the first half
 /// let mut buf = [0u8; 5];
@@ -74,8 +74,8 @@ pub mod fs {
         use std::fs::File;
         use std::sync::Arc;
 
-        pub type ReadPos = super::ReadPos<File, Arc<File>>;
-        pub type ReadSlice = super::ReadSlice<File, Arc<File>>;
+        pub type ReadPos = super::ReadPos<Arc<File>>;
+        pub type ReadSlice = super::ReadSlice<Arc<File>>;
     }
 }
 
