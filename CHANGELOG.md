@@ -1,8 +1,33 @@
 ## 0.3.0 (TBD)
+* Make `ReadPos` and `ReadSlice` generic over `PosRead` trait, and owned or
+  reference `File` types (#1):
+  * Implement `PosRead` trait generically over all `Borrow<File>`.
+  * Move `ReadPos` and `ReadSlice` types to `olio::fs` module and make them
+    generic over any `PosRead`. In combination with the above change, for
+    example, this supports an owned `ReadPos<File>` or shared reference
+    `ReadPos<&File>` or `ReadPos<Arc<File>>`.
+  * The existing `olio::fs::rc::ReadPos` and `ReadSlice` become type aliases
+    of the `Arc<File>` forms of the above, so no breaking change.
+  * Add new `olio::fs::ReadSubSlice` trait with an associate type, which is
+    now required to use `ReadPos::subslice` or `ReadSlice::Subslice` for
+    `Clone` references. This is a breaking change.
+
+* New benchmarks (cargo bench read_all) for sanity checking
+  `ReadPos`/`ReadSlice` reads vs direct/raw `File` reads. As expected, the
+  differences here are small (within error margins) in comparison to file I/O
+  system call cost even with fast SSD/OS-cache. Also, the generic changes did
+  not have a measurable effect.
+
+  dev i7-5600U, rustc 1.27.0-nightly (acd3871ba 2018-05-10):
+  ``` text
+  test read_all_pos   ... bench:   1,716,227 ns/iter (+/- 127,651)
+  test read_all_raw   ... bench:   1,721,675 ns/iter (+/- 85,265)
+  test read_all_slice ... bench:   1,712,060 ns/iter (+/- 140,824)
+  ```
 
 * `GatheringReader` benchmark improvements with latest rust nightly:
 
-  dev host; i7-5600U, rustc 1.27.0-nightly (acd3871ba 2018-05-10):
+  dev i7-5600U, rustc 1.27.0-nightly (acd3871ba 2018-05-10):
   ``` text
   test gather_chained_cursors   ... bench:     540,762 ns/iter (+/- 11,658)
   test gather_reader            ... bench:      34,323 ns/iter (+/- 7,333)
