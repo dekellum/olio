@@ -60,16 +60,6 @@ where P: PosRead
     pos_read: P,
 }
 
-/// Types that can be subsliced to a `ReadSlice`.
-pub trait ReadSubSlice
-{
-    type ReadSliceType;
-
-    /// Return a new and independent `ReadSlice` for the range of byte offsets
-    /// `start..end`.
-    fn subslice(&self, start: u64, end: u64) -> Self::ReadSliceType;
-}
-
 impl<P> ReadPos<P>
 where P: PosRead
 {
@@ -176,17 +166,15 @@ where P: PosRead
     }
 }
 
-impl<P> ReadSubSlice for ReadPos<P>
+impl<P> ReadPos<P>
 where P: PosRead + Clone
 {
-    type ReadSliceType = ReadSlice<P>;
-
     /// Return a new and independent `ReadSlice` by clone of the inner
     /// `PosRead`, for the range of byte offsets `start..end`, and positoned
     /// at start. This implementation _panics_ if start is greater than
     /// end. Note that the end parameter is not checked against the length of
     /// self as passed on construction.
-    fn subslice(&self, start: u64, end: u64) -> Self::ReadSliceType {
+    pub fn subslice(&self, start: u64, end: u64) -> ReadSlice<P> {
         ReadSlice::new(self.pos_read.clone(), start, end)
     }
 }
@@ -345,17 +333,15 @@ where P: PosRead
     }
 }
 
-impl<P> ReadSubSlice for ReadSlice<P>
+impl<P> ReadSlice<P>
 where P: PosRead + Clone
 {
-    type ReadSliceType = Self;
-
     /// Return a new and independent `ReadSlice` by clone of the inner
     /// `PosRead`, for the range of byte offsets `start..end` which are
     /// relative to, and must be fully contained by self. This implementation
     /// _panics_ on overflow, if start..end is not fully contained, or if
     /// start is greater-than end.
-    fn subslice(&self, start: u64, end: u64) -> Self {
+    pub fn subslice(&self, start: u64, end: u64) -> ReadSlice<P> {
         let abs_start = self.start.checked_add(start)
             .expect("ReadSlice::subslice start overflow");
         let abs_end = self.start.checked_add(end)

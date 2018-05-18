@@ -32,7 +32,7 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 /// # use std::io;
 /// use std::fs::File;
 /// use std::io::{Read, Write};
-/// use olio::fs::{ReadPos, ReadSlice, ReadSubSlice};
+/// use olio::fs::{ReadPos, ReadSlice};
 /// use tempfile::tempfile;
 ///
 /// # fn run() -> Result<(), io::Error> {
@@ -67,7 +67,7 @@ pub mod fs {
     pub use fs::pos_read::PosRead;
 
     mod read;
-    pub use fs::read::{ReadPos, ReadSlice, ReadSubSlice};
+    pub use fs::read::{ReadPos, ReadSlice};
 
     /// Compatibility type aliases.
     pub mod rc {
