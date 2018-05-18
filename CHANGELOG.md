@@ -8,9 +8,6 @@
     `ReadPos<&File>` or `ReadPos<Arc<File>>`.
   * The existing `olio::fs::rc::ReadPos` and `ReadSlice` become type aliases
     of the `Arc<File>` forms of the above, so no breaking change.
-  * Add new `olio::fs::ReadSubSlice` trait with an associate type, which is
-    now required to use `ReadPos::subslice` or `ReadSlice::Subslice` for
-    `Clone` references. This is a breaking change.
 
 * New benchmarks (cargo bench read_all) for sanity checking
   `ReadPos`/`ReadSlice` reads vs direct/raw `File` reads. As expected, the
