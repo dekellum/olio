@@ -3,7 +3,7 @@
 //!
 //! ## Optional Features
 //!
-//! _mmap (default):_ Adds `fs::ReadSlice::<File, _>::mem_map` support for memory
+//! _mmap (default):_ Adds `fs::ReadSlice::<File>::mem_map` support for memory
 //! mapping.
 
 #[cfg(feature = "mmap")] extern crate memmap;
