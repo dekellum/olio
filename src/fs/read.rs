@@ -1,7 +1,8 @@
-use std::borrow::Borrow;
-use std::fs::File;
 use std::io;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
+
+#[cfg(feature = "mmap")] use std::borrow::Borrow;
+#[cfg(feature = "mmap")] use std::fs::File;
 
 use fs::PosRead;
 
