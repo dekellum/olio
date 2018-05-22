@@ -1,4 +1,4 @@
-## 0.3.0 (TBD)
+## 0.3.0 (2018-5-22)
 * Make `ReadPos` and `ReadSlice` generic over `PosRead` trait, and owned or
   reference `File` types (#1):
   * Implement `PosRead` trait generically over all `Borrow<File>`.
