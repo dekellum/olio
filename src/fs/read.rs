@@ -379,6 +379,7 @@ where P: PosRead + Borrow<File>
 
 #[cfg(test)]
 mod tests {
+    use std::fs::File;
     use std::io::{BufReader, Read, Write};
     use std::sync::Arc;
     use std::thread;
