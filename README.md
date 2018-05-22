@@ -1,6 +1,6 @@
 # olio
 
-[![Crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=2592000)](https://crates.io/crates/olio)
+[![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
 [![Rustdoc](https://docs.rs/olio/badge.svg)](https://docs.rs/olio)
 [![Travis CI Build](https://travis-ci.org/dekellum/olio.svg?branch=master)](https://travis-ci.org/dekellum/olio)
 [![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/x5tf8nomocbl787w?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
