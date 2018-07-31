@@ -1,6 +1,16 @@
 //! This crate provides I/O-related utilities complimenting the Rust Standard
 //! Library `std::io`, `std::fs`, etc.
 //!
+//! ## Overview
+//!
+//! The [_fs_ module](fs/index.html) includes a `PosRead` trait, offering a
+//! uniform `pread` for positioned file reads, and a `ReadSlice` supporting
+//! multiple independent reader instances limited to a fixed
+//! start..end range.
+//!
+//! The [_io_ module](io/index.html) includes a `GatheringReader`, which
+//! presents a continuous `Read` interface over N non-contiguous byte buffers.
+//!
 //! ## Optional Features
 //!
 //! _mmap (default):_ Adds `fs::ReadSlice::<File>::mem_map` support for memory
