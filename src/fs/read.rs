@@ -183,7 +183,7 @@ where P: PosRead + Clone
 impl<P> ReadSlice<P>
 where P: PosRead
 {
-    /// New instance by `PosRead` reference, fixed start and end offsets. The
+    /// New instance by `PosRead` instance, fixed start and end offsets. The
     /// initial position is at the start (relative offset 0).
     pub fn new(pos_read: P, start: u64, end: u64) -> Self {
         assert!(start <= end);
