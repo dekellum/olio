@@ -22,8 +22,8 @@ travis-ci = { repository = "dekellum/olio" }
 memmap     = { version = ">=0.6.2, <2", optional = true }
 
 [dev-dependencies]
-bytes      = ">=0.4.6, <2"
-tempfile   = ">=2.2.0, <4"
+bytes      = { version = ">=0.4.6, <2" }
+tempfile   = { version = ">=2.2.0, <4" }
 
 [features]
 default = ["mmap"]
