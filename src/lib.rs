@@ -11,12 +11,16 @@
 //! The [_io_ module](io/index.html) includes a `GatheringReader`, which
 //! presents a continuous `Read` interface over N non-contiguous byte buffers.
 //!
+//! The [_mem_ module](mem/index.html) includes a `MemHandle` supporting
+//! prioritized concurrent memory access advice (e.g. madvise (2) on unix).
+//!
 //! ## Optional Features
 //!
 //! _mmap (default):_ Adds `fs::ReadSlice::<File>::mem_map` support for memory
 //! mapping.
 
 #[cfg(feature = "mmap")] extern crate memmap;
+#[cfg(unix)]             extern crate libc;
 
 /// The crate version string.
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -93,4 +97,10 @@ pub mod fs {
 pub mod io {
     mod gather;
     pub use io::gather::GatheringReader;
+}
+
+/// Random access memory utilities
+pub mod mem {
+    mod handle;
+    pub use mem::handle::{MemAdviseError, MemHandle, MemAdvice};
 }
