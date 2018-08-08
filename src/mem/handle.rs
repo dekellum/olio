@@ -1,7 +1,7 @@
 use ::std;
+use std::cell::Cell;
 use std::fmt;
 use std::io;
-use std::mem;
 use std::ops::Deref;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT};
@@ -70,7 +70,7 @@ pub struct MemHandle<T>
 where T: Deref<Target=[u8]>
 {
     mem: Arc<Mem<T>>,
-    advice: MemAdvice,
+    advice: Cell<MemAdvice>,
 }
 
 impl<T> MemHandle<T>
@@ -78,7 +78,7 @@ where T: Deref<Target=[u8]>
 {
     pub fn new(mem: T) -> MemHandle<T> {
         let mem = Arc::new(Mem { mem, advisors: ATOMIC_USIZE_INIT });
-        MemHandle { mem, advice: MemAdvice::Normal }
+        MemHandle { mem, advice: Cell::new(MemAdvice::Normal) }
     }
 
     /// Advise on access plans for the underlying memory. There may be
@@ -88,10 +88,10 @@ where T: Deref<Target=[u8]>
     /// returns the MemAdvice as relayed, or a snapshot of the current,
     /// highest priority advice. Returns an error if the underlying system
     /// call fails.
-    pub fn advise(&mut self, advice: MemAdvice)
+    pub fn advise(&self, advice: MemAdvice)
         -> Result<MemAdvice, MemAdviseError>
     {
-        let prior = mem::replace(&mut self.advice, advice);
+        let prior = self.advice.replace(advice);
         if advice == prior {
             Ok(prior)
         } else {
@@ -104,7 +104,7 @@ impl<T> Clone for MemHandle<T>
 where T: Deref<Target=[u8]>
 {
     fn clone(&self) -> MemHandle<T> {
-        MemHandle { mem: self.mem.clone(), advice: MemAdvice::Normal }
+        MemHandle { mem: self.mem.clone(), advice: Cell::new(MemAdvice::Normal) }
     }
 }
 
@@ -112,8 +112,9 @@ impl<T> Drop for MemHandle<T>
 where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
-        if self.advice != MemAdvice::Normal {
-            self.mem.adjust_advice(self.advice, MemAdvice::Normal).ok();
+        let advice = self.advice.get();
+        if  advice != MemAdvice::Normal {
+            self.mem.adjust_advice(advice, MemAdvice::Normal).ok();
         }
     }
 }
@@ -261,12 +262,10 @@ mod tests {
     }
 
     fn is_send<T: Send>() -> bool { true }
-    fn is_sync<T: Sync>() -> bool { true }
 
     #[test]
     fn test_send_sync() {
         assert!(is_send::<MemHandle<Vec<u8>>>());
-        assert!(is_sync::<MemHandle<Vec<u8>>>());
     }
 
     #[cfg(feature = "mmap")]
@@ -288,7 +287,7 @@ mod tests {
                 f.write_all(&vec![1u8; 256 * 1024]).unwrap();
                 unsafe { Mmap::map(&f) }.unwrap()
             };
-            let mut mem = MemHandle::new(map);
+            let mem = MemHandle::new(map);
             assert_eq!(mem.advise(Normal).unwrap(),     Normal);
             assert_eq!(mem.advise(Random).unwrap(),     Random);
             assert_eq!(mem.advise(Random).unwrap(),     Random);
@@ -307,8 +306,8 @@ mod tests {
                 f.write_all(&vec![1u8; 256 * 1024]).unwrap();
                 unsafe { Mmap::map(&f) }.unwrap()
             };
-            let mut h1 = MemHandle::new(map);
-            let mut h2 = h1.clone();
+            let h1 = MemHandle::new(map);
+            let h2 = h1.clone();
             assert_eq!(h1.advise(Sequential).unwrap(), Sequential);
             assert_eq!(1u8, h1[0]);
             assert_eq!(h2.advise(Random).unwrap(), Sequential);
@@ -324,8 +323,8 @@ mod tests {
                 f.write_all(&vec![1u8; 256 * 1024]).unwrap();
                 unsafe { Mmap::map(&f) }.unwrap()
             };
-            let mut h1 = MemHandle::new(map);
-            let mut h2 = h1.clone();
+            let h1 = MemHandle::new(map);
+            let h2 = h1.clone();
             assert_eq!(h1.advise(Sequential).unwrap(), Sequential);
             drop(h1);
             assert_eq!(h2.advise(Normal).unwrap(), Normal);
@@ -338,14 +337,14 @@ mod tests {
                 f.write_all(&vec![1u8; 256 * 1024]).unwrap();
                 unsafe { Mmap::map(&f) }.unwrap()
             };
-            let mut h1 = MemHandle::new(map);
-            let mut h2 = h1.clone();
-            let mut h3 = h2.clone();
+            let h1 = MemHandle::new(map);
+            let h2 = h1.clone();
+            let h3 = h2.clone();
             assert_eq!(h1.advise(Sequential).unwrap(), Sequential);
             assert_eq!(h2.advise(Random).unwrap(),     Sequential);
             assert_eq!(h3.advise(Random).unwrap(),     Sequential);
-            drop(h1);
-            assert_eq!(h3.advise(Normal).unwrap(),     Random); //h2 wins
+            drop(h1); //after which h2 (+h3) wins, now Random
+            assert_eq!(h3.advise(Normal).unwrap(),     Random); //h2 remains
         }
     }
 }
