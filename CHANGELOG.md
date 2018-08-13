@@ -1,4 +1,8 @@
 ## 0.4.0 (master, unreleased)
+* New `mem::MemHandle` wrapper for `Mmap` or other `Deref` byte buffer types,
+  offering concurrent-aware access advice. This is currently limited to \*nix
+  `libc::posix_madvise` with a subset of advice flags, and is no-op on other
+  platforms.
 
 ## 0.3.0 (2018-5-22)
 * Make `ReadPos` and `ReadSlice` generic over `PosRead` trait, and owned or
