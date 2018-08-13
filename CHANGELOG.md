@@ -1,4 +1,4 @@
-## 0.4.0 (master, unreleased)
+## 0.4.0 (2018-8-13)
 * New `mem::MemHandle` wrapper for `Mmap` or other `Deref` byte buffer types,
   offering concurrent-aware access advice. This is currently limited to \*nix
   `libc::posix_madvise` with a subset of advice flags, and is no-op on other
