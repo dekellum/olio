@@ -9,6 +9,16 @@
 Provides I/O-related utilities complimenting the Rust Standard Library
 `std::io`, `std::fs`, etc.
 
+* The _fs_ module includes a `PosRead` trait, offering a uniform pread
+  for positioned file reads; and a `ReadSlice` supporting multiple
+  independent reader instances limited to a fixed start..end range.
+
+* The _io_ module includes a `GatheringReader`, which presents a
+  continuous Read interface over N non-contiguous byte buffers.
+
+* The _mem_ module includes a `MemHandle` supporting prioritized
+  concurrent memory access advice (e.g. madvise (2) on unix).
+
 ## License
 
 This project is dual licensed under either of following:
