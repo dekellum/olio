@@ -76,6 +76,9 @@ where T: Deref<Target=[u8]>
 impl<T> MemHandle<T>
 where T: Deref<Target=[u8]>
 {
+    /// Wrap an owned instance of a byte slice buffer. Additional (atomic)
+    /// references to the underlying buffer can then be created by `clone` of
+    /// this handle.
     pub fn new(mem: T) -> MemHandle<T> {
         let mem = Arc::new(Mem { mem, advisors: ATOMIC_USIZE_INIT });
         MemHandle { mem, advice: Cell::new(MemAdvice::Normal) }
