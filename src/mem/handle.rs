@@ -276,6 +276,7 @@ mod tests {
         extern crate tempfile;
 
         use std::io::Write;
+        use std::thread;
 
         use self::tempfile::tempfile;
         use memmap::Mmap;
@@ -348,6 +349,33 @@ mod tests {
             assert_eq!(h3.advise(Random).unwrap(),     Sequential);
             drop(h1); //after which h2 (+h3) wins, now Random
             assert_eq!(h3.advise(Normal).unwrap(),     Random); //h2 remains
+        }
+
+        #[test]
+        fn test_advise_threads() {
+            for _ in 0..100 {
+                let map = {
+                    let mut f = tempfile().unwrap();
+                    f.write_all(&vec![1u8; 256 * 1024]).unwrap();
+                    unsafe { Mmap::map(&f) }.unwrap()
+                };
+                let h1 = MemHandle::new(map);
+                let h2 = h1.clone();
+                let h3 = h2.clone();
+                let mut threads = Vec::with_capacity(3);
+                threads.push(thread::spawn( move || {
+                    assert_eq!(h1.advise(Sequential).unwrap(), Sequential);
+                }));
+                threads.push(thread::spawn( move || {
+                    assert!(h2.advise(Random).unwrap() >= Random);
+                }));
+                threads.push(thread::spawn( move || {
+                    assert!(h3.advise(Random).unwrap() >= Random);
+                }));
+                for t in threads {
+                    t.join().unwrap();
+                }
+            }
         }
     }
 }
