@@ -274,11 +274,15 @@ mod tests {
     #[cfg(feature = "mmap")]
     mod mmap {
         extern crate tempfile;
+        extern crate rand;
 
         use std::io::Write;
+        use std::thread;
 
         use self::tempfile::tempfile;
         use memmap::Mmap;
+
+        use self::rand::Rng;
 
         use ::mem::MemHandle;
         use ::mem::MemAdvice::*;
@@ -348,6 +352,34 @@ mod tests {
             assert_eq!(h3.advise(Random).unwrap(),     Sequential);
             drop(h1); //after which h2 (+h3) wins, now Random
             assert_eq!(h3.advise(Normal).unwrap(),     Random); //h2 remains
+        }
+
+        #[test]
+        fn test_advise_threaded() {
+            let mut rng = rand::thread_rng();
+            let one_of = vec![Normal, Random, Sequential];
+            let map = {
+                let mut f = tempfile().unwrap();
+                f.write_all(&vec![2u8; 64 * 1024]).unwrap();
+                unsafe { Mmap::map(&f) }.unwrap()
+            };
+            let h0 = MemHandle::new(map);
+            for _ in 0..47 {
+                let mut threads = Vec::with_capacity(100);
+                let advices = (0..13).map(|_| *rng.choose(&one_of).unwrap());
+                for advice in advices {
+                    let hc = h0.clone();
+                    threads.push(thread::spawn( move || {
+                        let res = hc.advise(advice).expect("advise");
+                        // Effective advice is always at least what is asked
+                        // for, regardless of ordering and handle lifetime.
+                        assert!( res >= advice );
+                    }));
+                }
+                for t in threads {
+                    t.join().unwrap();
+                }
+            }
         }
     }
 }
