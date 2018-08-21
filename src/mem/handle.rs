@@ -274,12 +274,15 @@ mod tests {
     #[cfg(feature = "mmap")]
     mod mmap {
         extern crate tempfile;
+        extern crate rand;
 
         use std::io::Write;
         use std::thread;
 
         use self::tempfile::tempfile;
         use memmap::Mmap;
+
+        use self::rand::Rng;
 
         use ::mem::MemHandle;
         use ::mem::MemAdvice::*;
@@ -352,26 +355,27 @@ mod tests {
         }
 
         #[test]
-        fn test_advise_threads() {
-            for _ in 0..100 {
-                let map = {
-                    let mut f = tempfile().unwrap();
-                    f.write_all(&vec![1u8; 256 * 1024]).unwrap();
-                    unsafe { Mmap::map(&f) }.unwrap()
-                };
-                let h1 = MemHandle::new(map);
-                let h2 = h1.clone();
-                let h3 = h2.clone();
-                let mut threads = Vec::with_capacity(3);
-                threads.push(thread::spawn( move || {
-                    assert_eq!(h1.advise(Sequential).unwrap(), Sequential);
-                }));
-                threads.push(thread::spawn( move || {
-                    assert!(h2.advise(Random).unwrap() >= Random);
-                }));
-                threads.push(thread::spawn( move || {
-                    assert!(h3.advise(Random).unwrap() >= Random);
-                }));
+        fn test_advise_threaded() {
+            let mut rng = rand::thread_rng();
+            let one_of = vec![Normal, Random, Sequential];
+            let map = {
+                let mut f = tempfile().unwrap();
+                f.write_all(&vec![2u8; 64 * 1024]).unwrap();
+                unsafe { Mmap::map(&f) }.unwrap()
+            };
+            let h0 = MemHandle::new(map);
+            for _ in 0..47 {
+                let mut threads = Vec::with_capacity(100);
+                let advices = (0..13).map(|_| *rng.choose(&one_of).unwrap());
+                for advice in advices {
+                    let hc = h0.clone();
+                    threads.push(thread::spawn( move || {
+                        let res = hc.advise(advice).expect("advise");
+                        // Effective advice is always at least what is asked
+                        // for, regardless of ordering and handle lifetime.
+                        assert!( res >= advice );
+                    }));
+                }
                 for t in threads {
                     t.join().unwrap();
                 }
