@@ -4,7 +4,14 @@ script:
   - 'if [ "$WITH_LOCK" != "true" ]; then cargo update; fi'
   - 'cargo test --no-default-features'
   - 'cargo test --all-features'
-cache: cargo
+
+# See https://levans.fr/rust_travis_cache.html
+cache:
+  directories:
+    - /home/travis/.cargo
+before_cache:
+  - rm -rf /home/travis/.cargo/registry
+
 rust: 1.26.2
 env: # important!
 matrix:
@@ -15,6 +22,8 @@ matrix:
     - rust: stable
       os: osx
     - rust: 1.26.2
+      env: WITH_LOCK=true
+    - rust: 1.27.2
       env: WITH_LOCK=true
     - rust: stable
     - rust: nightly
