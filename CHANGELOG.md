@@ -1,4 +1,6 @@
 ## 0.5.0 (TBD)
+* Use u64 offset with latest *memmap* crate release 0.7.0 in
+  `ReadSlice::mem_map`. The *memmap* crate minimum version is now 0.7.0.
 
 ## 0.4.0 (2018-8-13)
 * New `mem::MemHandle` wrapper for `Mmap` or other `Deref` byte buffer types,
