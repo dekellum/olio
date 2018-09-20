@@ -6,8 +6,7 @@ use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
 
 use fs::PosRead;
 
-#[cfg(feature = "mmap")]
-use memmap::{Mmap, MmapOptions};
+#[cfg(feature = "mmap")] use memmap::{Mmap, MmapOptions};
 
 /// Re-implements `Read` and `Seek` over `PosRead` using _only_ positioned
 /// reads, and by maintaining an instance independent position.
@@ -365,12 +364,11 @@ where P: PosRead + Borrow<File>
         let offset = self.start;
         let len = self.len();
         // See: https://github.com/danburkert/memmap-rs/pull/65
-        assert!(offset <= usize::max_value() as u64);
-        assert!(len    <= usize::max_value() as u64);
-        assert!(len > 0);
+        assert!(len  > 0);
+        assert!(len <= usize::max_value() as u64);
         unsafe {
             MmapOptions::new()
-                .offset(offset as usize)
+                .offset(offset)
                 .len(len as usize)
                 .map(self.pos_read.borrow())
         }

@@ -19,7 +19,7 @@ exclude       = [
 travis-ci = { repository = "dekellum/olio" }
 
 [dependencies]
-memmap     = { version = ">=0.6.2, <2", optional = true }
+memmap     = { version = ">=0.7.0, <2", optional = true }
 libc       = { version = ">=0.2.42, <2" }
 
 [dev-dependencies]
