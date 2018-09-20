@@ -1,3 +1,5 @@
+## 0.5.0 (TBD)
+
 ## 0.4.0 (2018-8-13)
 * New `mem::MemHandle` wrapper for `Mmap` or other `Deref` byte buffer types,
   offering concurrent-aware access advice. This is currently limited to \*nix
