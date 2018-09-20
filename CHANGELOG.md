@@ -1,8 +1,8 @@
-## 0.5.0 (TBD)
+## 0.5.0 (2018-9-20)
 * Use u64 offset with latest *memmap* crate release 0.7.0 in
   `ReadSlice::mem_map`. The *memmap* crate minimum version is now 0.7.0.
 
-* Minimal rust version is now 1.27.2.
+* Minimum supported rust version is now 1.27.2.
 
 ## 0.4.0 (2018-8-13)
 * New `mem::MemHandle` wrapper for `Mmap` or other `Deref` byte buffer types,
