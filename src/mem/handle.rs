@@ -116,7 +116,7 @@ where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
         let advice = self.advice.get();
-        if  advice != MemAdvice::Normal {
+        if advice != MemAdvice::Normal {
             self.mem.adjust_advice(advice, MemAdvice::Normal).ok();
         }
     }
