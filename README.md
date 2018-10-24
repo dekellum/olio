@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
 [![Rustdoc](https://docs.rs/olio/badge.svg)](https://docs.rs/olio)
 [![Travis CI Build](https://travis-ci.org/dekellum/olio.svg?branch=master)](https://travis-ci.org/dekellum/olio)
-[![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/x5tf8nomocbl787w?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
+[![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/x5tf8nomocbl787w/branch/master?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
 [![deps status](https://deps.rs/repo/github/dekellum/olio/status.svg)](https://deps.rs/repo/github/dekellum/olio)
 
 Provides I/O-related utilities complimenting the Rust Standard Library
