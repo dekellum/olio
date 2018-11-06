@@ -373,7 +373,7 @@ mod tests {
                         let res = hc.advise(advice).expect("advise");
                         // Effective advice is always at least what is asked
                         // for, regardless of ordering and handle lifetime.
-                        assert!( res >= advice );
+                        assert!(res >= advice);
                     }));
                 }
                 for t in threads {
