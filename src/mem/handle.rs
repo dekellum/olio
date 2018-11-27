@@ -282,7 +282,7 @@ mod tests {
         use self::tempfile::tempfile;
         use memmap::Mmap;
 
-        use self::rand::Rng;
+        use self::rand::seq::SliceRandom;
 
         use ::mem::MemHandle;
         use ::mem::MemAdvice::*;
@@ -366,7 +366,9 @@ mod tests {
             let h0 = MemHandle::new(map);
             for _ in 0..47 {
                 let mut threads = Vec::with_capacity(100);
-                let advices = (0..13).map(|_| *rng.choose(&one_of).unwrap());
+                let advices = (0..13).map(|_| {
+                    *one_of.choose(&mut rng).unwrap()
+                });
                 for advice in advices {
                     let hc = h0.clone();
                     threads.push(thread::spawn( move || {
