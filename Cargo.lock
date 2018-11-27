@@ -69,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "olio"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "bytes 0.4.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.44 (registry+https://github.com/rust-lang/crates.io-index)",
