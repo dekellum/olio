@@ -16,13 +16,13 @@ exclude       = [".gitignore", ".travis.yml", "appveyor.yml"]
 travis-ci = { repository="dekellum/olio" }
 
 [dependencies]
-memmap     = { version=">=0.7.0, <2", optional=true }
-libc       = { version=">=0.2.42, <2" }
+memmap     = { version=">=0.7.0, <0.8", optional=true }
+libc       = { version=">=0.2.42, <0.3" }
 
 [dev-dependencies]
-bytes      = { version=">=0.4.6, <2" }
+bytes      = { version=">=0.4.6, <0.5" }
 tempfile   = { version=">=2.2.0, <4" }
-rand       = { version=">=0.6.1, <2" }
+rand       = { version=">=0.6.1, <0.7" }
 
 [features]
 default = ["mmap"]
