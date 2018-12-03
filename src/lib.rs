@@ -20,9 +20,6 @@
 //! mapping.
 #![warn(rust_2018_idioms)]
 
-#[cfg(feature = "mmap")] extern crate memmap;
-#[cfg(unix)]             extern crate libc;
-
 /// The crate version string.
 pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 

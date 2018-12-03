@@ -273,16 +273,13 @@ mod tests {
 
     #[cfg(feature = "mmap")]
     mod mmap {
-        extern crate tempfile;
-        extern crate rand;
-
         use std::io::Write;
         use std::thread;
 
-        use self::tempfile::tempfile;
+        use tempfile::tempfile;
         use memmap::Mmap;
 
-        use self::rand::seq::SliceRandom;
+        use rand::seq::SliceRandom;
 
         use crate::mem::MemHandle;
         use crate::mem::MemAdvice::*;

@@ -381,8 +381,8 @@ mod tests {
     use std::io::{BufReader, Read, Write};
     use std::sync::Arc;
     use std::thread;
-    extern crate tempfile;
-    use self::tempfile::tempfile;
+
+    use tempfile::tempfile;
     use super::*;
 
     #[test]
