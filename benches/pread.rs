@@ -1,7 +1,8 @@
 //! These benchmarks compare raw file reads vs positioned reads.
+#![warn(rust_2018_idioms)]
 
 #![feature(test)]
-extern crate test;
+extern crate test; // Still required, see rust-lang/rust#55133
 extern crate olio;
 extern crate tempfile;
 

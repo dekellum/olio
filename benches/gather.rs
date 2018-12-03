@@ -1,9 +1,10 @@
 //! These benchmarks compare the custom built `GatheringReader`, to a chained
 //! cursor approach from `std`, for reading a typical scattered vector of byte
 //! buffers.
+#![warn(rust_2018_idioms)]
 
 #![feature(test)]
-extern crate test;
+extern crate test; // Still required, see rust-lang/rust#55133
 extern crate olio;
 extern crate bytes;
 
