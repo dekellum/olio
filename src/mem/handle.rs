@@ -26,7 +26,7 @@ impl From<MemAdviseError> for io::Error {
 }
 
 impl fmt::Display for MemAdviseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "libc::posix_madvise error return code {}", self.ecode)
     }
 }

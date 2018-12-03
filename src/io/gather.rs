@@ -7,7 +7,7 @@ use std::io::{Cursor, Read};
 /// This is more efficient than the current implementation of
 /// `std::io::Cursor::chain` for many reads over many buffers. See the
 /// associated benchmark comparison.
-pub struct GatheringReader<'a, T: AsRef<[u8]> + 'a> {
+pub struct GatheringReader<'a, T: AsRef<[u8]>> {
     current: Cursor<&'a [u8]>,
     remainder: &'a [T]
 }
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn test_send_sync() {
-        assert!(is_send::<GatheringReader<Vec<u8>>>());
-        assert!(is_sync::<GatheringReader<Vec<u8>>>());
+        assert!(is_send::<GatheringReader<'_, Vec<u8>>>());
+        assert!(is_sync::<GatheringReader<'_, Vec<u8>>>());
     }
 }
