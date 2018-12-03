@@ -3,16 +3,16 @@
 
 #![feature(test)]
 extern crate test; // Still required, see rust-lang/rust#55133
-extern crate olio;
-extern crate tempfile;
 
-use olio::fs::{ReadPos, ReadSlice};
-use test::Bencher;
 use std::fs::File;
 use std::io;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::sync::Arc;
+
 use tempfile::tempfile;
+use test::Bencher;
+
+use olio::fs::{ReadPos, ReadSlice};
 
 const CHUNK_COUNT: usize = 48;
 const CHUNK_SIZE: usize = 8 * 1024;

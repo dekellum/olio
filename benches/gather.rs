@@ -5,14 +5,14 @@
 
 #![feature(test)]
 extern crate test; // Still required, see rust-lang/rust#55133
-extern crate olio;
-extern crate bytes;
 
-use olio::io::GatheringReader;
-use bytes::{BufMut, Bytes, BytesMut};
-use test::Bencher;
 use std::io;
 use std::io::{Cursor, Read};
+
+use bytes::{BufMut, Bytes, BytesMut};
+use test::Bencher;
+
+use olio::io::GatheringReader;
 
 const CHUNK_SIZE: usize = 8 * 1024;
 const CHUNK_COUNT: usize = 40;
@@ -94,7 +94,7 @@ fn read_gathered(buffers: &[Bytes]) -> Result<usize, io::Error> {
 }
 
 fn read_chained(buffers: &[Bytes]) -> Result<usize, io::Error> {
-    let mut r: Box<Read> = Box::new(Cursor::new(&buffers[0]));
+    let mut r: Box<dyn Read> = Box::new(Cursor::new(&buffers[0]));
     for b in &buffers[1..] {
         r = Box::new(r.chain(Cursor::new(b)));
     }
