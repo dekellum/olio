@@ -255,7 +255,7 @@ fn advise<T>(_mem: &T, _advice: MemAdvice) -> Result<(), MemAdviseError>
 
 #[cfg(test)]
 mod tests {
-    use ::mem::MemHandle;
+    use crate::mem::MemHandle;
 
     #[test]
     fn test_with_any_deref() {
@@ -284,8 +284,8 @@ mod tests {
 
         use self::rand::seq::SliceRandom;
 
-        use ::mem::MemHandle;
-        use ::mem::MemAdvice::*;
+        use crate::mem::MemHandle;
+        use crate::mem::MemAdvice::*;
 
         #[test]
         fn test_advise_one() {

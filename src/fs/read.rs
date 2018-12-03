@@ -4,7 +4,7 @@ use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
 #[cfg(feature = "mmap")] use std::borrow::Borrow;
 #[cfg(feature = "mmap")] use std::fs::File;
 
-use fs::PosRead;
+use crate::fs::PosRead;
 
 #[cfg(feature = "mmap")] use memmap::{Mmap, MmapOptions};
 
