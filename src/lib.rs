@@ -18,7 +18,7 @@
 //!
 //! _mmap (default):_ Adds `fs::ReadSlice::<File>::mem_map` support for memory
 //! mapping.
-#![warn(bare_trait_objects)]
+#![warn(rust_2018_idioms)]
 
 #[cfg(feature = "mmap")] extern crate memmap;
 #[cfg(unix)]             extern crate libc;
