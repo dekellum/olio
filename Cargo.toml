@@ -10,23 +10,19 @@ repository    = "https://github.com/dekellum/olio"
 readme        = "README.md"
 keywords      = ["file", "fs", "io"]
 categories    = ["filesystem"]
-exclude       = [
-    ".gitignore",
-    ".travis.yml",
-    "appveyor.yml",
-]
+exclude       = [".gitignore", ".travis.yml", "appveyor.yml"]
 
 [badges]
-travis-ci = { repository = "dekellum/olio" }
+travis-ci = { repository="dekellum/olio" }
 
 [dependencies]
-memmap     = { version = ">=0.7.0, <2", optional = true }
-libc       = { version = ">=0.2.42, <2" }
+memmap     = { version=">=0.7.0, <2", optional=true }
+libc       = { version=">=0.2.42, <2" }
 
 [dev-dependencies]
-bytes      = { version = ">=0.4.6, <2" }
-tempfile   = { version = ">=2.2.0, <4" }
-rand       = { version = ">=0.6.1, <2" }
+bytes      = { version=">=0.4.6, <2" }
+tempfile   = { version=">=2.2.0, <4" }
+rand       = { version=">=0.6.1, <2" }
 
 [features]
 default = ["mmap"]
@@ -34,6 +30,3 @@ mmap = ["memmap"]
 
 [lib]
 doctest = true
-
-[package.metadata.docs.rs]
-features = ["mmap"]
