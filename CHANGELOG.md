@@ -1,4 +1,4 @@
-## 0.6.0 (TBD)
+## 1.0.0 (TBD)
 
 ## 0.5.0 (2018-9-20)
 * Use u64 offset with latest *memmap* crate release 0.7.0 in
