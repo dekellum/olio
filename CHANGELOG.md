@@ -1,4 +1,11 @@
 ## 1.0.0 (TBD)
+* Update to the rust 2018 edition, including the changes to pass all 2018 idiom
+  lints (anchored paths, anonymous/elided lifetimes, dyn Trait).  _This start
+  of the 1.x release series is dependent on rust 1.31 (currently beta) and thus
+  less stable than prior 0.x releases, which will continue to be maintained as
+  needed._
+
+* Update (dev dep) to rand 0.6.1, fix deprecation in test.
 
 ## 0.5.0 (2018-9-20)
 * Use u64 offset with latest *memmap* crate release 0.7.0 in
