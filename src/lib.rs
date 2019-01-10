@@ -76,10 +76,10 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 /// ```
 pub mod fs {
     mod pos_read;
-    pub use self::pos_read::PosRead;
+    pub use pos_read::PosRead;
 
     mod read;
-    pub use self::read::{ReadPos, ReadSlice};
+    pub use read::{ReadPos, ReadSlice};
 
     /// Compatibility type aliases.
     pub mod rc {
@@ -94,11 +94,11 @@ pub mod fs {
 /// I/O extensions and utilities
 pub mod io {
     mod gather;
-    pub use self::gather::GatheringReader;
+    pub use gather::GatheringReader;
 }
 
 /// Random access memory utilities
 pub mod mem {
     mod handle;
-    pub use self::handle::{MemAdviseError, MemHandle, MemAdvice};
+    pub use handle::{MemAdviseError, MemHandle, MemAdvice};
 }
