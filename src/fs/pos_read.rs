@@ -28,7 +28,7 @@ pub trait PosRead {
 }
 
 impl<B> PosRead for B
-where B: Borrow<File>
+    where B: Borrow<File>
 {
     #[cfg(unix)]
     #[inline]

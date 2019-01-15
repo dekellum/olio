@@ -67,14 +67,14 @@ pub enum MemAdvice {
 /// advice.
 #[derive(Debug)]
 pub struct MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     mem: Arc<Mem<T>>,
     advice: Cell<MemAdvice>,
 }
 
 impl<T> MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     /// Wrap an owned instance of a byte slice buffer. Additional (atomic)
     /// references to the underlying buffer can then be created by `clone` of
@@ -104,7 +104,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Clone for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     fn clone(&self) -> MemHandle<T> {
         MemHandle { mem: self.mem.clone(), advice: Cell::new(MemAdvice::Normal) }
@@ -112,7 +112,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Drop for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
         let advice = self.advice.get();
@@ -123,7 +123,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Deref for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     type Target = [u8];
 
@@ -134,14 +134,14 @@ where T: Deref<Target=[u8]>
 
 #[derive(Debug)]
 struct Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     mem: T,
     advisors: AtomicUsize,
 }
 
 impl<T> Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
         -> Result<MemAdvice, MemAdviseError>
@@ -171,7 +171,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Deref for Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     type Target = [u8];
 
