@@ -368,7 +368,7 @@ mod tests {
                 });
                 for advice in advices {
                     let hc = h0.clone();
-                    threads.push(thread::spawn( move || {
+                    threads.push(thread::spawn(move || {
                         let res = hc.advise(advice).expect("advise");
                         // Effective advice is always at least what is asked
                         // for, regardless of ordering and handle lifetime.

@@ -462,7 +462,7 @@ mod tests {
         let mut threads = Vec::with_capacity(30);
         for i in 0..50 {
             let mut rpc = ReadPos::new(f.clone(), rule.len() as u64);
-            threads.push(thread::spawn( move || {
+            threads.push(thread::spawn(move || {
                 let p = i % rule.len();
                 rpc.seek(SeekFrom::Start(p as u64)).expect("seek");
 

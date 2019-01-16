@@ -21,7 +21,7 @@ const READ_BUFF_SIZE: usize = 101;
 #[bench]
 fn read_all_raw(b: &mut Bencher) {
     let mut file = create_file().expect("create file");
-    b.iter( || {
+    b.iter(|| {
         file.seek(SeekFrom::Start(0)).expect("rewind");
         let len = read_to_end(&mut file).expect("read raw");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
@@ -31,7 +31,7 @@ fn read_all_raw(b: &mut Bencher) {
 #[bench]
 fn read_all_pos(b: &mut Bencher) {
     let file = Arc::new(create_file().unwrap());
-    b.iter( || {
+    b.iter(|| {
         let mut rdr = ReadPos::new(
             file.clone(),
             (CHUNK_SIZE * CHUNK_COUNT) as u64
@@ -44,7 +44,7 @@ fn read_all_pos(b: &mut Bencher) {
 #[bench]
 fn read_all_slice(b: &mut Bencher) {
     let file = Arc::new(create_file().unwrap());
-    b.iter( || {
+    b.iter(|| {
         let mut rdr = ReadSlice::new(
             file.clone(),
             0,
