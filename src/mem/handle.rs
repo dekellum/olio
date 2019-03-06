@@ -31,10 +31,7 @@ impl fmt::Display for MemAdviseError {
     }
 }
 
-impl std::error::Error for MemAdviseError {
-    fn description(&self) -> &str { "MemAdviseError" }
-    fn cause(&self) -> Option<&dyn std::error::Error> { None }
-}
+impl std::error::Error for MemAdviseError {}
 
 /// Memory access pattern advice.
 ///
