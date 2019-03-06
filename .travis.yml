@@ -1,7 +1,6 @@
 language: rust
 dist: xenial
 script:
-  - 'if [ "$WITH_LOCK" != "true" ]; then cargo update; fi'
   - 'cargo test --no-default-features'
   - 'cargo test --all-features'
 
@@ -17,13 +16,9 @@ matrix:
   include:
     - rust: 1.31.0
     - rust: 1.31.0
-      env: WITH_LOCK=true
-    - rust: stable
+      os: osx
       env: WITH_LOCK=true
     - rust: nightly
       env: MAY_FAIL=true
-    - rust: 1.31.0
-      os: osx
-      env: WITH_LOCK=true
   allow_failures:
     - env: MAY_FAIL=true
