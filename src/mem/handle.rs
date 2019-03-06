@@ -4,7 +4,7 @@ use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT};
+use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::{SeqCst, Relaxed};
 
 #[cfg(unix)] use libc;
@@ -80,8 +80,10 @@ impl<T> MemHandle<T>
     /// references to the underlying buffer can then be created by `clone` of
     /// this handle.
     pub fn new(mem: T) -> MemHandle<T> {
-        let mem = Arc::new(Mem { mem, advisors: ATOMIC_USIZE_INIT });
-        MemHandle { mem, advice: Cell::new(MemAdvice::Normal) }
+        MemHandle {
+            mem: Arc::new(Mem::new(mem)),
+            advice: Cell::new(MemAdvice::Normal)
+        }
     }
 
     /// Advise on access plans for the underlying memory. There may be
@@ -143,6 +145,10 @@ struct Mem<T>
 impl<T> Mem<T>
     where T: Deref<Target=[u8]>
 {
+    fn new(mem: T) -> Mem<T> {
+        Mem { mem, advisors: AtomicUsize::new(0) }
+    }
+
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
         -> Result<MemAdvice, MemAdviseError>
     {
