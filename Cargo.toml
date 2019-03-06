@@ -1,6 +1,6 @@
 [package]
 name          = "olio"
-version       = "1.0.0"
+version       = "1.0.1"
 edition       = "2018"
 authors       = ["David Kellum <dek-oss@gravitext.com>"]
 license       = "MIT/Apache-2.0"
@@ -21,7 +21,7 @@ libc       = { version=">=0.2.42, <0.3" }
 
 [dev-dependencies]
 bytes      = { version=">=0.4.6, <0.5" }
-tempfile   = { version=">=2.2.0, <4" }
+tempfile   = { version=">=3.0.5, <4" }
 rand       = { version=">=0.6.1, <0.7" }
 
 [features]

@@ -4,7 +4,7 @@ use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT};
+use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::{SeqCst, Relaxed};
 
 #[cfg(unix)] use libc;
@@ -31,10 +31,7 @@ impl fmt::Display for MemAdviseError {
     }
 }
 
-impl std::error::Error for MemAdviseError {
-    fn description(&self) -> &str { "MemAdviseError" }
-    fn cause(&self) -> Option<&dyn std::error::Error> { None }
-}
+impl std::error::Error for MemAdviseError {}
 
 /// Memory access pattern advice.
 ///
@@ -67,21 +64,23 @@ pub enum MemAdvice {
 /// advice.
 #[derive(Debug)]
 pub struct MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     mem: Arc<Mem<T>>,
     advice: Cell<MemAdvice>,
 }
 
 impl<T> MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     /// Wrap an owned instance of a byte slice buffer. Additional (atomic)
     /// references to the underlying buffer can then be created by `clone` of
     /// this handle.
     pub fn new(mem: T) -> MemHandle<T> {
-        let mem = Arc::new(Mem { mem, advisors: ATOMIC_USIZE_INIT });
-        MemHandle { mem, advice: Cell::new(MemAdvice::Normal) }
+        MemHandle {
+            mem: Arc::new(Mem::new(mem)),
+            advice: Cell::new(MemAdvice::Normal)
+        }
     }
 
     /// Advise on access plans for the underlying memory. There may be
@@ -104,7 +103,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Clone for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     fn clone(&self) -> MemHandle<T> {
         MemHandle { mem: self.mem.clone(), advice: Cell::new(MemAdvice::Normal) }
@@ -112,7 +111,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Drop for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
         let advice = self.advice.get();
@@ -123,7 +122,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Deref for MemHandle<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     type Target = [u8];
 
@@ -134,15 +133,19 @@ where T: Deref<Target=[u8]>
 
 #[derive(Debug)]
 struct Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     mem: T,
     advisors: AtomicUsize,
 }
 
 impl<T> Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
+    fn new(mem: T) -> Mem<T> {
+        Mem { mem, advisors: AtomicUsize::new(0) }
+    }
+
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
         -> Result<MemAdvice, MemAdviseError>
     {
@@ -171,7 +174,7 @@ where T: Deref<Target=[u8]>
 }
 
 impl<T> Deref for Mem<T>
-where T: Deref<Target=[u8]>
+    where T: Deref<Target=[u8]>
 {
     type Target = [u8];
 
@@ -368,7 +371,7 @@ mod tests {
                 });
                 for advice in advices {
                     let hc = h0.clone();
-                    threads.push(thread::spawn( move || {
+                    threads.push(thread::spawn(move || {
                         let res = hc.advise(advice).expect("advise");
                         // Effective advice is always at least what is asked
                         // for, regardless of ordering and handle lifetime.

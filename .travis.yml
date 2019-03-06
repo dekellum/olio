@@ -1,5 +1,5 @@
 language: rust
-sudo: false
+dist: xenial
 script:
   - 'if [ "$WITH_LOCK" != "true" ]; then cargo update; fi'
   - 'cargo test --no-default-features'
@@ -12,18 +12,18 @@ cache:
 before_cache:
   - rm -rf /home/travis/.cargo/registry
 
-rust: beta
 env: # important!
 matrix:
   include:
-    - rust: beta
-      os: osx
+    - rust: 1.31.0
+    - rust: 1.31.0
       env: WITH_LOCK=true
-    - rust: beta
-      env: WITH_LOCK=true
-    - rust: nightly
+    - rust: stable
       env: WITH_LOCK=true
     - rust: nightly
       env: MAY_FAIL=true
+    - rust: 1.31.0
+      os: osx
+      env: WITH_LOCK=true
   allow_failures:
     - env: MAY_FAIL=true

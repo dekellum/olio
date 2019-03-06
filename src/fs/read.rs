@@ -24,7 +24,7 @@ use crate::fs::PosRead;
 /// is also allowed for `ReadPos`.
 #[derive(Debug)]
 pub struct ReadPos<P>
-where P: PosRead
+    where P: PosRead
 {
     pos: u64,
     length: u64,
@@ -52,7 +52,7 @@ where P: PosRead
 /// platforms for `File`, and is also allowed for `ReadSlice`.
 #[derive(Debug)]
 pub struct ReadSlice<P>
-where P: PosRead
+    where P: PosRead
 {
     start: u64,
     pos: u64,
@@ -61,7 +61,7 @@ where P: PosRead
 }
 
 impl<P> ReadPos<P>
-where P: PosRead
+    where P: PosRead
 {
     /// New instance for `PosRead` and fixed length. The initial position is
     /// the start (index 0).
@@ -114,7 +114,7 @@ where P: PosRead
 }
 
 impl<P> Clone for ReadPos<P>
-where P: PosRead + Clone
+    where P: PosRead + Clone
 {
     /// Return a new, independent `ReadPos` by clone of the inner `PosRead`,
     /// with the same length as self, and at position 0.
@@ -126,7 +126,7 @@ where P: PosRead + Clone
 }
 
 impl<P> PosRead for ReadPos<P>
-where P: PosRead
+    where P: PosRead
 {
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
@@ -135,7 +135,7 @@ where P: PosRead
 }
 
 impl<P> Read for ReadPos<P>
-where P: PosRead
+    where P: PosRead
 {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -146,7 +146,7 @@ where P: PosRead
 }
 
 impl<P> Seek for ReadPos<P>
-where P: PosRead
+    where P: PosRead
 {
     fn seek(&mut self, from: SeekFrom) -> io::Result<u64> {
         match from {
@@ -167,7 +167,7 @@ where P: PosRead
 }
 
 impl<P> ReadPos<P>
-where P: PosRead + Clone
+    where P: PosRead + Clone
 {
     /// Return a new and independent `ReadSlice` by clone of the inner
     /// `PosRead`, for the range of byte offsets `start..end`, and positoned
@@ -180,7 +180,7 @@ where P: PosRead + Clone
 }
 
 impl<P> ReadSlice<P>
-where P: PosRead
+    where P: PosRead
 {
     /// New instance by `PosRead` instance, fixed start and end offsets. The
     /// initial position is at the start (relative offset 0).
@@ -266,7 +266,7 @@ where P: PosRead
 }
 
 impl<P> Clone for ReadSlice<P>
-where P: PosRead + Clone
+    where P: PosRead + Clone
 {
     /// Return a new, independent `ReadSlice` by clone of the inner `PosRead`,
     /// with the same start and end as self, and positioned at start.
@@ -279,7 +279,7 @@ where P: PosRead + Clone
 }
 
 impl<P> PosRead for ReadSlice<P>
-where P: PosRead
+    where P: PosRead
 {
     #[inline]
     fn pread(&self, buf: &mut [u8], offset: u64) -> io::Result<usize> {
@@ -293,7 +293,7 @@ where P: PosRead
 }
 
 impl<P> Read for ReadSlice<P>
-where P: PosRead
+    where P: PosRead
 {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
@@ -304,7 +304,7 @@ where P: PosRead
 }
 
 impl<P> Seek for ReadSlice<P>
-where P: PosRead
+    where P: PosRead
 {
     /// Seek to an offset, in bytes, in a stream. In this implementation,
     /// seeks are relative to the fixed start offset so a seek to
@@ -334,7 +334,7 @@ where P: PosRead
 }
 
 impl<P> ReadSlice<P>
-where P: PosRead + Clone
+    where P: PosRead + Clone
 {
     /// Return a new and independent `ReadSlice` by clone of the inner
     /// `PosRead`, for the range of byte offsets `start..end` which are
@@ -356,7 +356,7 @@ where P: PosRead + Clone
 
 #[cfg(feature = "mmap")]
 impl<P> ReadSlice<P>
-where P: PosRead + Borrow<File>
+    where P: PosRead + Borrow<File>
 {
     /// Return a new read-only memory map handle `Mmap` for the complete
     /// region of the underlying `File`, from start to end.
@@ -462,7 +462,7 @@ mod tests {
         let mut threads = Vec::with_capacity(30);
         for i in 0..50 {
             let mut rpc = ReadPos::new(f.clone(), rule.len() as u64);
-            threads.push(thread::spawn( move || {
+            threads.push(thread::spawn(move || {
                 let p = i % rule.len();
                 rpc.seek(SeekFrom::Start(p as u64)).expect("seek");
 

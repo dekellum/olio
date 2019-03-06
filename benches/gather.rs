@@ -21,7 +21,7 @@ const READ_BUFF_SIZE: usize = 101;
 #[bench]
 fn gather_reader(b: &mut Bencher) {
     let buffers = create_buffers();
-    b.iter( move || {
+    b.iter(move || {
         let len = read_gathered(&buffers).expect("read");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
     })
@@ -30,7 +30,7 @@ fn gather_reader(b: &mut Bencher) {
 #[bench]
 fn gather_x_chained_cursors(b: &mut Bencher) {
     let buffers = create_buffers();
-    b.iter( move || {
+    b.iter(move || {
         let len = read_chained(&buffers).expect("read");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
     })
@@ -45,7 +45,7 @@ fn gather_upfront(b: &mut Bencher) {
         }
         bufs
     };
-    b.iter( || {
+    b.iter(|| {
         let buffers = buffers.clone(); // shallow
         let buf = gather(buffers);
         let cur = Cursor::new(&buf);
@@ -63,7 +63,7 @@ fn gather_upfront_read_only(b: &mut Bencher) {
         }
         gather(buffers)
     };
-    b.iter( || {
+    b.iter(|| {
         let cur = Cursor::new(&buf);
         let len = read_to_end(cur).expect("read");
         assert_eq!(CHUNK_SIZE * CHUNK_COUNT, len);
