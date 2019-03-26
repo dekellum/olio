@@ -2,7 +2,7 @@
 * Use `AtomicUsize::new`, a `const fn` since rustc 1.24.0. `ATOMIC_USIZE_INIT`
   was deprecated as of rust 1.34.0 (nightly).
 
-## 1.0.0 (2018-12-04)
+## 1.0.0 (2018-12-4)
 * Update to the rust 2018 edition, including the changes to pass all 2018 idiom
   lints (anchored paths, anonymous/elided lifetimes, dyn Trait).  _This start
   of the 1.x release series has a minimum supported rust version of 1.31.0, and
