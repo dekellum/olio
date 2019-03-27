@@ -11,6 +11,7 @@ readme        = "README.md"
 keywords      = ["file", "fs", "io"]
 categories    = ["filesystem"]
 exclude       = [".gitignore", ".travis.yml", "appveyor.yml"]
+build         = "build.rs"
 
 [badges]
 travis-ci = { repository="dekellum/olio" }
