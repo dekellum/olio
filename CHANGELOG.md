@@ -1,3 +1,5 @@
+## 1.1.0 (TBD)
+
 ## 1.0.1 (2019-3-6)
 * Use `AtomicUsize::new`, a `const fn` since rustc 1.24.0. `ATOMIC_USIZE_INIT`
   was deprecated as of rust 1.34.0 (nightly).
