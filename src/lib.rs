@@ -38,9 +38,6 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 /// ## Example
 ///
 /// ``` rust
-/// extern crate olio;
-/// extern crate tempfile;
-///
 /// # use std::io;
 /// use std::fs::File;
 /// use std::io::{Read, Write};
