@@ -4,10 +4,28 @@ use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::AtomicUsize;
+
+#[cfg(olio_std_atomic_u64)]
+use std::sync::atomic::AtomicU64 as AtomicUnit;
+
+#[cfg(not(olio_std_atomic_u64))]
+use std::sync::atomic::AtomicUsize as AtomicUnit;
+
 use std::sync::atomic::Ordering::{SeqCst, Relaxed};
 
 #[cfg(unix)] use libc;
+
+// Prefer a u64 representation, available on rustc 1.34+ where `AtomicU64` is
+// stable, since it affords room for 6 advise levels above baseline (currently
+// `Normal`).
+
+#[cfg(olio_std_atomic_u64)]
+#[allow(non_camel_case_types)]
+type unit = u64;
+
+#[cfg(not(olio_std_atomic_u64))]
+#[allow(non_camel_case_types)]
+type unit = usize;
 
 /// Possible error with `libc::(posix_)madvise()`, or other platform
 /// equivalent.
@@ -40,6 +58,23 @@ impl std::error::Error for MemAdviseError {}
 /// correspond to any libc or other lib constants, and are arranged in
 /// ascending order of minimal to maximum *priority* in the presence of
 /// concurrent interest in the same region.
+#[cfg(olio_std_atomic_u64)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u64)]
+pub enum MemAdvice {
+    Normal     = 0,       // Not counted
+    Random     = 0x003FF, // Bits  1-10 mask value
+    Sequential = 0xFFC00, // Bits 11-20 mask value
+}
+
+/// Memory access pattern advice.
+///
+/// This encodes a subset of POSIX.1-2001 `madvise` flags, and is intending to
+/// be a workable cross platform abstraction. In particular, the values do not
+/// correspond to any libc or other lib constants, and are arranged in
+/// ascending order of minimal to maximum *priority* in the presence of
+/// concurrent interest in the same region.
+#[cfg(not(olio_std_atomic_u64))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(usize)]
 pub enum MemAdvice {
@@ -136,14 +171,14 @@ struct Mem<T>
     where T: Deref<Target=[u8]>
 {
     mem: T,
-    advisors: AtomicUsize,
+    advisors: AtomicUnit,
 }
 
 impl<T> Mem<T>
     where T: Deref<Target=[u8]>
 {
     fn new(mem: T) -> Mem<T> {
-        Mem { mem, advisors: AtomicUsize::new(0) }
+        Mem { mem, advisors: AtomicUnit::new(0) }
     }
 
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
@@ -184,9 +219,9 @@ impl<T> Deref for Mem<T>
 }
 
 // Given packed advisors state, and prior advice, return decremented state.
-fn decr_advisors(mut advisors: usize, prior: MemAdvice) -> usize {
+fn decr_advisors(mut advisors: unit, prior: MemAdvice) -> unit {
     if prior != MemAdvice::Normal {
-        let mut p = advisors & (prior as usize);
+        let mut p = advisors & (prior as unit);
         advisors -= p;
         if prior == MemAdvice::Sequential { p >>= 10; }
         if p > 0 { p -= 1; }
@@ -197,8 +232,8 @@ fn decr_advisors(mut advisors: usize, prior: MemAdvice) -> usize {
 }
 
 // Given packed advisors state, and new advice, return incremented state.
-fn incr_advisors(mut advisors: usize, advice: MemAdvice) -> usize {
-    let mut cur = advisors & (advice as usize);
+fn incr_advisors(mut advisors: unit, advice: MemAdvice) -> unit {
+    let mut cur = advisors & (advice as unit);
     advisors -= cur;
     match advice {
         MemAdvice::Normal => {
@@ -218,10 +253,10 @@ fn incr_advisors(mut advisors: usize, advice: MemAdvice) -> usize {
 }
 
 // Return top most advice from advisors state.
-fn top_most(advisors: usize) -> MemAdvice {
-    if (advisors & (MemAdvice::Sequential as usize)) > 0 {
+fn top_most(advisors: unit) -> MemAdvice {
+    if (advisors & (MemAdvice::Sequential as unit)) > 0 {
         MemAdvice::Sequential
-    } else if (advisors & (MemAdvice::Random as usize)) > 0 {
+    } else if (advisors & (MemAdvice::Random as unit)) > 0 {
         MemAdvice::Random
     } else {
         MemAdvice::Normal
