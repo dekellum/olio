@@ -1,13 +1,35 @@
-use ::std;
 use std::cell::Cell;
 use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::{SeqCst, Relaxed};
 
 #[cfg(unix)] use libc;
+
+// Prefer a u64 representation of advice on all platforms, as it affords room
+// for 6 advise levels above baseline (currently `Normal`). Of course, usize is
+// already 64 bit unsigned on platforms like x86_64. As of rust 1.34
+// `AtomicU64` is stable, on all supported platforms. Start using u64 when
+// possible, and raise MSRV to 1.34 once the bits are needed.
+
+#[cfg(olio_std_atomic_u64)]
+mod types {
+    #[allow(non_camel_case_types)]
+    pub type uadv = u64;
+
+    pub use std::sync::atomic::AtomicU64 as AtomicUadv;
+}
+
+#[cfg(not(olio_std_atomic_u64))]
+mod types {
+    #[allow(non_camel_case_types)]
+    pub type uadv = usize;
+
+    pub use std::sync::atomic::AtomicUsize as AtomicUadv;
+}
+
+use self::types::*;
 
 /// Possible error with `libc::(posix_)madvise()`, or other platform
 /// equivalent.
@@ -40,6 +62,23 @@ impl std::error::Error for MemAdviseError {}
 /// correspond to any libc or other lib constants, and are arranged in
 /// ascending order of minimal to maximum *priority* in the presence of
 /// concurrent interest in the same region.
+#[cfg(olio_std_atomic_u64)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u64)]
+pub enum MemAdvice {
+    Normal     = 0,       // Not counted
+    Random     = 0x003FF, // Bits  1-10 mask value
+    Sequential = 0xFFC00, // Bits 11-20 mask value
+}
+
+/// Memory access pattern advice.
+///
+/// This encodes a subset of POSIX.1-2001 `madvise` flags, and is intending to
+/// be a workable cross platform abstraction. In particular, the values do not
+/// correspond to any libc or other lib constants, and are arranged in
+/// ascending order of minimal to maximum *priority* in the presence of
+/// concurrent interest in the same region.
+#[cfg(not(olio_std_atomic_u64))]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(usize)]
 pub enum MemAdvice {
@@ -136,14 +175,14 @@ struct Mem<T>
     where T: Deref<Target=[u8]>
 {
     mem: T,
-    advisors: AtomicUsize,
+    advisors: AtomicUadv,
 }
 
 impl<T> Mem<T>
     where T: Deref<Target=[u8]>
 {
     fn new(mem: T) -> Mem<T> {
-        Mem { mem, advisors: AtomicUsize::new(0) }
+        Mem { mem, advisors: AtomicUadv::new(0) }
     }
 
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
@@ -184,9 +223,9 @@ impl<T> Deref for Mem<T>
 }
 
 // Given packed advisors state, and prior advice, return decremented state.
-fn decr_advisors(mut advisors: usize, prior: MemAdvice) -> usize {
+fn decr_advisors(mut advisors: uadv, prior: MemAdvice) -> uadv {
     if prior != MemAdvice::Normal {
-        let mut p = advisors & (prior as usize);
+        let mut p = advisors & (prior as uadv);
         advisors -= p;
         if prior == MemAdvice::Sequential { p >>= 10; }
         if p > 0 { p -= 1; }
@@ -197,8 +236,8 @@ fn decr_advisors(mut advisors: usize, prior: MemAdvice) -> usize {
 }
 
 // Given packed advisors state, and new advice, return incremented state.
-fn incr_advisors(mut advisors: usize, advice: MemAdvice) -> usize {
-    let mut cur = advisors & (advice as usize);
+fn incr_advisors(mut advisors: uadv, advice: MemAdvice) -> uadv {
+    let mut cur = advisors & (advice as uadv);
     advisors -= cur;
     match advice {
         MemAdvice::Normal => {
@@ -218,10 +257,10 @@ fn incr_advisors(mut advisors: usize, advice: MemAdvice) -> usize {
 }
 
 // Return top most advice from advisors state.
-fn top_most(advisors: usize) -> MemAdvice {
-    if (advisors & (MemAdvice::Sequential as usize)) > 0 {
+fn top_most(advisors: uadv) -> MemAdvice {
+    if (advisors & (MemAdvice::Sequential as uadv)) > 0 {
         MemAdvice::Sequential
-    } else if (advisors & (MemAdvice::Random as usize)) > 0 {
+    } else if (advisors & (MemAdvice::Random as uadv)) > 0 {
         MemAdvice::Random
     } else {
         MemAdvice::Normal

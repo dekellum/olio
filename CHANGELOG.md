@@ -1,4 +1,9 @@
 ## 1.1.0 (TBD)
+* On rust 1.34+, where `AtomicU64` is stable, use u64 representation of
+  `olio::mem::MemAdvice` and `MemHandle` internal state, instead of usize, as
+  it affords room for 6 advise levels above baseline (currently `Normal`) on
+  all supported platforms.
+
 * Narrow various dependencies to avoid future MINOR versions, for reliability.
   We may subsequently make PATCH releases which _broaden_ private or public
   dependencies to include new MINOR releases found _compatible_. Rationale:
