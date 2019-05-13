@@ -1,31 +1,35 @@
-use ::std;
 use std::cell::Cell;
 use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-
-#[cfg(olio_std_atomic_u64)]
-use std::sync::atomic::AtomicU64 as AtomicUnit;
-
-#[cfg(not(olio_std_atomic_u64))]
-use std::sync::atomic::AtomicUsize as AtomicUnit;
-
 use std::sync::atomic::Ordering::{SeqCst, Relaxed};
 
 #[cfg(unix)] use libc;
 
-// Prefer a u64 representation, available on rustc 1.34+ where `AtomicU64` is
-// stable, since it affords room for 6 advise levels above baseline (currently
-// `Normal`).
+// Prefer a u64 representation of advice on all platforms, as it affords room
+// for 6 advise levels above baseline (currently `Normal`). Of course, usize is
+// already 64 bit unsigned on platforms like x86_64. As of rust 1.34
+// `AtomicU64` is stable, on all supported platforms. Start using u64 when
+// possible, and raise MSRV to 1.34 once the bits are needed.
 
 #[cfg(olio_std_atomic_u64)]
-#[allow(non_camel_case_types)]
-type unit = u64;
+mod types {
+    #[allow(non_camel_case_types)]
+    pub type uadv = u64;
+
+    pub use std::sync::atomic::AtomicU64 as AtomicUadv;
+}
 
 #[cfg(not(olio_std_atomic_u64))]
-#[allow(non_camel_case_types)]
-type unit = usize;
+mod types {
+    #[allow(non_camel_case_types)]
+    pub type uadv = usize;
+
+    pub use std::sync::atomic::AtomicUsize as AtomicUadv;
+}
+
+use self::types::*;
 
 /// Possible error with `libc::(posix_)madvise()`, or other platform
 /// equivalent.
@@ -171,14 +175,14 @@ struct Mem<T>
     where T: Deref<Target=[u8]>
 {
     mem: T,
-    advisors: AtomicUnit,
+    advisors: AtomicUadv,
 }
 
 impl<T> Mem<T>
     where T: Deref<Target=[u8]>
 {
     fn new(mem: T) -> Mem<T> {
-        Mem { mem, advisors: AtomicUnit::new(0) }
+        Mem { mem, advisors: AtomicUadv::new(0) }
     }
 
     fn adjust_advice(&self, prior: MemAdvice, advice: MemAdvice)
@@ -219,9 +223,9 @@ impl<T> Deref for Mem<T>
 }
 
 // Given packed advisors state, and prior advice, return decremented state.
-fn decr_advisors(mut advisors: unit, prior: MemAdvice) -> unit {
+fn decr_advisors(mut advisors: uadv, prior: MemAdvice) -> uadv {
     if prior != MemAdvice::Normal {
-        let mut p = advisors & (prior as unit);
+        let mut p = advisors & (prior as uadv);
         advisors -= p;
         if prior == MemAdvice::Sequential { p >>= 10; }
         if p > 0 { p -= 1; }
@@ -232,8 +236,8 @@ fn decr_advisors(mut advisors: unit, prior: MemAdvice) -> unit {
 }
 
 // Given packed advisors state, and new advice, return incremented state.
-fn incr_advisors(mut advisors: unit, advice: MemAdvice) -> unit {
-    let mut cur = advisors & (advice as unit);
+fn incr_advisors(mut advisors: uadv, advice: MemAdvice) -> uadv {
+    let mut cur = advisors & (advice as uadv);
     advisors -= cur;
     match advice {
         MemAdvice::Normal => {
@@ -253,10 +257,10 @@ fn incr_advisors(mut advisors: unit, advice: MemAdvice) -> unit {
 }
 
 // Return top most advice from advisors state.
-fn top_most(advisors: unit) -> MemAdvice {
-    if (advisors & (MemAdvice::Sequential as unit)) > 0 {
+fn top_most(advisors: uadv) -> MemAdvice {
+    if (advisors & (MemAdvice::Sequential as uadv)) > 0 {
         MemAdvice::Sequential
-    } else if (advisors & (MemAdvice::Random as unit)) > 0 {
+    } else if (advisors & (MemAdvice::Random as uadv)) > 0 {
         MemAdvice::Random
     } else {
         MemAdvice::Normal
