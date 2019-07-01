@@ -1,4 +1,5 @@
 ## 1.2.0 (TBD)
+* Minimum supported rust version is now 1.32.0 (to match above dep updates).
 
 ## 1.1.0 (2019-5-13)
 * On rust 1.34+, where `AtomicU64` is stable, use u64 representation of
