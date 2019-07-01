@@ -1,3 +1,5 @@
+## 1.2.0 (TBD)
+
 ## 1.1.0 (2019-5-13)
 * On rust 1.34+, where `AtomicU64` is stable, use u64 representation of
   `olio::mem::MemAdvice` and `MemHandle` internal state, instead of usize, as
