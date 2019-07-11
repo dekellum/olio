@@ -19,12 +19,16 @@ Provides I/O-related utilities complimenting the Rust Standard Library
 * The _mem_ module includes a `MemHandle` supporting prioritized
   concurrent memory access advice (e.g. madvise (2) on unix).
 
-## Minimum supported rust version (MSRV)
+## Minimum supported rust version
 
-1.32.0
+MSRV := 1.32.0
 
-The project will fail fast on any lower rustc (via a build.rs version
+The crate will fail fast on any lower rustc (via a build.rs version
 check) and is also CI tested on this version.
+
+With rustc 1.34.0+, uses (stable) `AtomicU64` and u64 for
+`olio::mem::MemAdvice` and `MemHandle` internal state on all supported
+platforms.
 
 ## License
 
