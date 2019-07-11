@@ -1,6 +1,6 @@
 ## 1.2.0 (TBD)
 
-* Update deps rand (0.7.x) and tempfile (3.1.x).
+* Update dev dependencies rand (0.7.0) and tempfile (3.1.0).
 
 * Minimum supported rust version is now 1.32.0 (to match above dep updates).
 
