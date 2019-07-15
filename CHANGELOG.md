@@ -1,4 +1,5 @@
 ## 1.2.0 (TBD)
+* Fix build.rs for `rustc --version` not including git metadata.
 
 * Update dev dependencies rand (0.7.0) and tempfile (3.1.0).
 
