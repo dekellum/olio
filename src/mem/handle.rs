@@ -2,7 +2,7 @@ use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::Ordering::{SeqCst, Relaxed};
+use std::sync::atomic::Ordering::{Acquire, SeqCst};
 
 #[cfg(unix)] use libc;
 
@@ -166,7 +166,7 @@ impl<T> Drop for MemHandle<T>
     where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
-        let advice = self.advice.load(Relaxed).into();
+        let advice = self.advice.load(Acquire).into();
         if advice != MemAdvice::Normal {
             self.mem.adjust_advice(advice, MemAdvice::Normal).ok();
         }
@@ -202,14 +202,14 @@ impl<T> Mem<T>
         -> Result<MemAdvice, MemAdviseError>
     {
         debug_assert!(prior != advice);
-        let mut adv = self.advisors.load(Relaxed);
+        let mut adv = self.advisors.load(Acquire);
         loop {
             let old_top = top_most(adv);
             let new_adv = decr_advisors(adv, prior);
             let new_adv = incr_advisors(new_adv, advice);
             let new_top = top_most(new_adv);
             match self.advisors.compare_exchange_weak(
-                adv, new_adv, SeqCst, Relaxed
+                adv, new_adv, SeqCst, Acquire
             ) {
                 Ok(_) => {
                     if new_top != old_top {
