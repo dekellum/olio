@@ -1,4 +1,7 @@
 ## 1.2.0 (TBD)
+* Make `olio::mem::MemHandle` a `Sync` type, by replacing the per-handle `Cell`
+  (for cache of last advice) with another atomic.
+
 * Fix build.rs for `rustc --version` not including git metadata.
 
 * Update dev dependencies rand (0.7.0) and tempfile (3.1.0).
