@@ -1,9 +1,8 @@
-use std::cell::Cell;
 use std::fmt;
 use std::io;
 use std::ops::Deref;
 use std::sync::Arc;
-use std::sync::atomic::Ordering::{SeqCst, Relaxed};
+use std::sync::atomic::Ordering::{Acquire, SeqCst};
 
 #[cfg(unix)] use libc;
 
@@ -87,6 +86,17 @@ pub enum MemAdvice {
     Sequential = 0xFFC00, // Bits 11-20 mask value
 }
 
+impl From<uadv> for MemAdvice {
+    fn from(v: uadv) -> Self {
+        match v {
+            0       => MemAdvice::Normal,
+            0x003FF => MemAdvice::Random,
+            0xFFC00 => MemAdvice::Sequential,
+            _       => unreachable!("not a MemAdvice repr!"),
+        }
+    }
+}
+
 /// Wrapper over a byte buffer, supporting concurrent memory access advice,
 /// where the highest priority advice wins.
 ///
@@ -106,7 +116,7 @@ pub struct MemHandle<T>
     where T: Deref<Target=[u8]>
 {
     mem: Arc<Mem<T>>,
-    advice: Cell<MemAdvice>,
+    advice: AtomicUadv,
 }
 
 impl<T> MemHandle<T>
@@ -118,7 +128,7 @@ impl<T> MemHandle<T>
     pub fn new(mem: T) -> MemHandle<T> {
         MemHandle {
             mem: Arc::new(Mem::new(mem)),
-            advice: Cell::new(MemAdvice::Normal)
+            advice: AtomicUadv::new(MemAdvice::Normal as uadv)
         }
     }
 
@@ -132,7 +142,7 @@ impl<T> MemHandle<T>
     pub fn advise(&self, advice: MemAdvice)
         -> Result<MemAdvice, MemAdviseError>
     {
-        let prior = self.advice.replace(advice);
+        let prior = self.advice.swap(advice as uadv, SeqCst).into();
         if advice == prior {
             Ok(prior)
         } else {
@@ -145,7 +155,10 @@ impl<T> Clone for MemHandle<T>
     where T: Deref<Target=[u8]>
 {
     fn clone(&self) -> MemHandle<T> {
-        MemHandle { mem: self.mem.clone(), advice: Cell::new(MemAdvice::Normal) }
+        MemHandle {
+            mem: self.mem.clone(),
+            advice: AtomicUadv::new(MemAdvice::Normal as uadv)
+        }
     }
 }
 
@@ -153,7 +166,7 @@ impl<T> Drop for MemHandle<T>
     where T: Deref<Target=[u8]>
 {
     fn drop(&mut self) {
-        let advice = self.advice.get();
+        let advice = self.advice.load(Acquire).into();
         if advice != MemAdvice::Normal {
             self.mem.adjust_advice(advice, MemAdvice::Normal).ok();
         }
@@ -189,14 +202,14 @@ impl<T> Mem<T>
         -> Result<MemAdvice, MemAdviseError>
     {
         debug_assert!(prior != advice);
-        let mut adv = self.advisors.load(Relaxed);
+        let mut adv = self.advisors.load(Acquire);
         loop {
             let old_top = top_most(adv);
             let new_adv = decr_advisors(adv, prior);
             let new_adv = incr_advisors(new_adv, advice);
             let new_top = top_most(new_adv);
             match self.advisors.compare_exchange_weak(
-                adv, new_adv, SeqCst, Relaxed
+                adv, new_adv, SeqCst, Acquire
             ) {
                 Ok(_) => {
                     if new_top != old_top {
@@ -307,10 +320,12 @@ mod tests {
     }
 
     fn is_send<T: Send>() -> bool { true }
+    fn is_sync<T: Sync>() -> bool { true }
 
     #[test]
     fn test_send_sync() {
         assert!(is_send::<MemHandle<Vec<u8>>>());
+        assert!(is_sync::<MemHandle<Vec<u8>>>());
     }
 
     #[cfg(feature = "mmap")]
