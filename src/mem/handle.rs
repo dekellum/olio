@@ -310,6 +310,8 @@ fn advise<T>(_mem: &T, _advice: MemAdvice) -> Result<(), MemAdviseError>
 
 #[cfg(test)]
 mod tests {
+    use std::mem;
+
     use crate::mem::MemHandle;
 
     #[test]
@@ -326,6 +328,12 @@ mod tests {
     fn test_send_sync() {
         assert!(is_send::<MemHandle<Vec<u8>>>());
         assert!(is_sync::<MemHandle<Vec<u8>>>());
+    }
+
+    #[test]
+    #[cfg(target_pointer_width = "64")]
+    fn test_size() {
+        assert_eq!(mem::size_of::<MemHandle<Vec<u8>>>(), 16);
     }
 
     #[cfg(feature = "mmap")]
