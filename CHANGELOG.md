@@ -1,4 +1,4 @@
-## 1.2.0 (TBD)
+## 1.2.0 (2019-9-30)
 * Make `olio::mem::MemHandle` a `Sync` type, by replacing the per-handle `Cell`
   (for cache of last advice) with another atomic.
 
