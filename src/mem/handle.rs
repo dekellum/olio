@@ -209,8 +209,8 @@ impl<T> Mem<T>
             let new_adv = incr_advisors(new_adv, advice);
             let new_top = top_most(new_adv);
             match self.advisors.compare_exchange_weak(
-                adv, new_adv, SeqCst, Acquire
-            ) {
+                adv, new_adv, SeqCst, Acquire)
+            {
                 Ok(_) => {
                     if new_top != old_top {
                         // Note, may fail after adjustments
