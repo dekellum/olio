@@ -15,10 +15,6 @@ fn main() {
             "{} v{} {} is {} > {} (this rustc)",
             PACKAGE, VERSION, M_V, join(&msrv), join(&rustv));
     }
-
-    if rustv >= vec![1, 34] {
-       println!("cargo:rustc-cfg=olio_std_atomic_u64");
-    }
 }
 
 fn join(ver: &Vec<u16>) -> String {
