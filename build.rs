@@ -3,7 +3,7 @@ use std::process::Command;
 
 fn main() {
     static PACKAGE: &'static str = "olio";
-    let msrv = vec![1, 32];
+    let msrv = vec![1, 34];
 
     static VERSION: &'static str = env!("CARGO_PKG_VERSION");
     static M_V: &'static str = "minimum supported rust version (MSRV)";
