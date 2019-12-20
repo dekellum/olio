@@ -71,10 +71,10 @@ fn gather_upfront_read_only(b: &mut Bencher) {
 }
 
 fn create_buffers() -> Vec<Bytes> {
-    let chunk = vec![65u8; CHUNK_SIZE];
+    let chunk: Bytes = vec![65u8; CHUNK_SIZE].into();
     let mut v = Vec::new();
     for _ in 0..CHUNK_COUNT {
-        v.push(chunk.as_slice().into());
+        v.push(chunk.clone());
     }
     v
 }

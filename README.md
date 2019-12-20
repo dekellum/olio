@@ -21,14 +21,10 @@ Provides I/O-related utilities complimenting the Rust Standard Library
 
 ## Minimum supported rust version
 
-MSRV := 1.32.0
+MSRV := 1.34.0
 
 The crate will fail fast on any lower rustc (via a build.rs version
 check) and is also CI tested on this version.
-
-With rustc 1.34.0+, uses (stable) `AtomicU64` and u64 for
-`olio::mem::MemAdvice` and `MemHandle` internal state on all supported
-platforms.
 
 ## License
 
