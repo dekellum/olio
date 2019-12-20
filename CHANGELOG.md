@@ -1,4 +1,12 @@
 ## 1.3.0 (TBD)
+* Expand bytes dev dependency to include 0.5.z.
+
+* Minimum supported rust version is now 1.34.0. CI testing is limited to the
+  older bytes 0.4.12 release on MSRV.  For the latest bytes 0.5.z, tests
+  require rust ≥1.39.0.
+
+* As `AtomicU64` was stabilized in rust 1.34.0, `olio::mem::MemAdvice` and
+  `MemHandle` now always uses u64 representation.
 
 ## 1.2.0 (2019-9-30)
 * Make `olio::mem::MemHandle` a `Sync` type, by replacing the per-handle `Cell`
