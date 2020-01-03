@@ -1,4 +1,4 @@
-## 1.3.0 (TBD)
+## 1.3.0 (2020-1-3)
 * Expand bytes dev dependency to include 0.5.z.
 
 * Minimum supported rust version is now 1.34.0. CI testing is limited to the
