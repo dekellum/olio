@@ -1,7 +1,8 @@
 # olio
 
-[![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
 [![Rustdoc](https://docs.rs/olio/badge.svg)](https://docs.rs/olio)
+[![Change Log](https://img.shields.io/crates/v/olio.svg?maxAge=3600&label=change%20log&color=9cf)](https://github.com/dekellum/olio/blob/master/CHANGELOG.md)
+[![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
 [![Travis CI Build](https://travis-ci.org/dekellum/olio.svg?branch=master)](https://travis-ci.org/dekellum/olio)
 [![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/x5tf8nomocbl787w/branch/master?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
 [![deps status](https://deps.rs/repo/github/dekellum/olio/status.svg)](https://deps.rs/repo/github/dekellum/olio)
