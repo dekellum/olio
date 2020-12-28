@@ -47,6 +47,7 @@ dependencies = [
  "libc",
  "memmap",
  "rand",
+ "remove_dir_all",
  "tempfile",
 ]
 
