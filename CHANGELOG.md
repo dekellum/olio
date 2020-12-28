@@ -1,3 +1,5 @@
+## 1.4.0 (unreleased)
+
 ## 1.3.0 (2020-1-3)
 * Expand bytes dev dependency to include 0.5.z.
 
