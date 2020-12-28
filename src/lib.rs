@@ -3,20 +3,19 @@
 //!
 //! ## Overview
 //!
-//! The [_fs_ module](fs/index.html) includes a `PosRead` trait, offering a
-//! uniform `pread` for positioned file reads, and a `ReadSlice` supporting
-//! multiple independent reader instances limited to a fixed
-//! start..end range.
+//! The [`fs`] module includes a [`fs::PosRead`] trait, offering a uniform
+//! `pread` for positioned file reads, and a [`fs::ReadSlice`] supporting
+//! multiple independent reader instances limited to a fixed start..end range.
 //!
-//! The [_io_ module](io/index.html) includes a `GatheringReader`, which
-//! presents a continuous `Read` interface over N non-contiguous byte buffers.
+//! The [`io`] module includes a [`io::GatheringReader`], which presents a
+//! continuous `Read` interface over N non-contiguous byte buffers.
 //!
-//! The [_mem_ module](mem/index.html) includes a `MemHandle` supporting
-//! prioritized concurrent memory access advice (e.g. madvise (2) on unix).
+//! The [`mem`] module includes a [`mem::MemHandle`] supporting prioritized
+//! concurrent memory access advice (e.g. madvise (2) on unix).
 //!
 //! ## Optional Features
 //!
-//! _mmap (default):_ Adds `fs::ReadSlice::<File>::mem_map` support for memory
+//! _mmap (default):_ Adds [`fs::ReadSlice::mem_map`] support for memory
 //! mapping.
 #![warn(rust_2018_idioms)]
 

@@ -11,7 +11,7 @@ use crate::fs::PosRead;
 /// Re-implements `Read` and `Seek` over `PosRead` using _only_ positioned
 /// reads, and by maintaining an instance independent position.
 ///
-/// [`PosRead`](trait.PosRead.html) is implemented for any `Borrow<File>` so
+/// [`PosRead`] is implemented for any `Borrow<File>` so
 /// this can own via `ReadPos<File>` or use a shared reference, as in
 /// `ReadPos<&File>` or `ReadPos<Arc<File>>`.
 ///
@@ -34,11 +34,11 @@ pub struct ReadPos<P>
 /// Re-implements `Read` and `Seek` over `PosRead` using _only_ positioned
 /// reads, and by maintaining instance independent start, end, and position.
 ///
-/// [`PosRead`](trait.PosRead.html) is implemented for any `Borrow<File>` so
+/// [`PosRead`] is implemented for any `Borrow<File>` so
 /// this can own via `ReadSlice<File>` or use a shared reference, as in
 /// `ReadSlice<&File>` or `ReadSlice<Arc<File>>`.
 ///
-/// As compared with [`ReadPos`](struct.ReadPos.html), `ReadSlice` adds a
+/// As compared with [`ReadPos`], `ReadSlice` adds a
 /// general start offset, and limits access to the start..end range. Seeks are
 /// relative, so a seek to `SeekFrom::Start(0)` is always the first byte of
 /// the slice.
@@ -360,6 +360,8 @@ impl<P> ReadSlice<P>
 {
     /// Return a new read-only memory map handle `Mmap` for the complete
     /// region of the underlying `File`, from start to end.
+    ///
+    /// This requires the _mmap_ feature.
     pub fn mem_map(&self) -> Result<Mmap, io::Error> {
         let offset = self.start;
         let len = self.len();
