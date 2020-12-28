@@ -24,15 +24,15 @@ pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Filesystem extensions and utilities.
 ///
-/// The `PosRead` trait offers a uniform `pread` for positioned reads.
+/// The [`fs::PosRead`] trait offers a uniform `pread` for positioned reads.
 ///
-/// The `ReadPos` and `ReadSlice` types re-implement `Read` and `Seek` over
-/// any `Borrow` of a `PosRead` type. For `File` in particular, this enables
-/// multiple independent reader instances, without needing a path to open an
-/// independent new `File` instance.  Thus these types are compatible with
-/// "unnamed" (not linked) temporary files, and can reduce the number of
-/// necessary file handles.  Note that unix `dup`/`dup2` and the standard
-/// `File::try_clone` do _not_ provide independent file positions.
+/// The [`fs::ReadPos`] and [`fs::ReadSlice`] types re-implement `Read` and
+/// `Seek` over any `Borrow` of a `PosRead` type. For `File` in particular,
+/// this enables multiple independent reader instances, without needing a path
+/// to open an independent new `File` instance.  Thus these types are
+/// compatible with "unnamed" (not linked) temporary files, and can reduce the
+/// number of necessary file handles.  Note that unix `dup`/`dup2` and the
+/// standard `File::try_clone` do _not_ provide independent file positions.
 ///
 /// ## Example
 ///
