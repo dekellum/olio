@@ -3,8 +3,7 @@
 [![Rustdoc](https://docs.rs/olio/badge.svg)](https://docs.rs/olio)
 [![Change Log](https://img.shields.io/crates/v/olio.svg?maxAge=3600&label=change%20log&color=9cf)](https://github.com/dekellum/olio/blob/master/CHANGELOG.md)
 [![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
-[![Travis CI Build](https://travis-ci.org/dekellum/olio.svg?branch=master)](https://travis-ci.org/dekellum/olio)
-[![Appveyor CI Build](https://ci.appveyor.com/api/projects/status/x5tf8nomocbl787w/branch/master?svg=true)](https://ci.appveyor.com/project/dekellum/olio)
+[![CI Status](https://github.com/dekellum/olio/workflows/CI/badge.svg?branch=master)](https://github.com/dekellum/olio/actions?query=workflow%3ACI)
 
 Provides I/O-related utilities complimenting the Rust Standard Library
 `std::io`, `std::fs`, etc.
@@ -21,7 +20,7 @@ Provides I/O-related utilities complimenting the Rust Standard Library
 
 ## Minimum supported rust version
 
-MSRV := 1.34.0
+MSRV := 1.39.0
 
 The crate will fail fast on any lower rustc (via a build.rs version
 check) and is also CI tested on this version.
