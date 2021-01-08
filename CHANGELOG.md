@@ -1,10 +1,11 @@
-## 1.4.0 (unreleased)
-
+## 1.4.0 (2021-1-8)
 * Minimum supported rust version is now 1.39.0, initially to remove
   various MSRV workarounds from CI.
 
 * Restrict remove_dir_all transitive dev dep of tempfile to 0.5.2 to preserve
   MSRV.
+
+* Improve docs (also using new rustdoc link format).
 
 ## 1.3.0 (2020-1-3)
 * Expand bytes dev dependency to include 0.5.z.
