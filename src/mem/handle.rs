@@ -7,8 +7,6 @@ use std::sync::atomic::{
 };
 use std::sync::Arc;
 
-#[cfg(unix)] use libc;
-
 // Prefer a u64 representation of advice on all platforms, as it affords room
 // for 6 advise levels above baseline (currently `Normal`). Of course, usize is
 // already 64 bit unsigned on platforms like x86_64.
