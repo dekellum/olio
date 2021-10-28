@@ -18,7 +18,7 @@ memmap     = { version=">=0.7.0, <0.8", optional=true }
 libc       = { version=">=0.2.42, <0.3" }
 
 [dev-dependencies]
-bytes      = { version=">=1.0.1, <1.1" }
+bytes      = { version=">=1.0.1, <1.2" }
 tempfile   = { version=">=3.1.0, <3.3" }
 rand       = { version=">=0.8.0, <0.9" }
 
