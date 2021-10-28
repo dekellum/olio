@@ -1,9 +1,9 @@
 # olio
 
 [![Rustdoc](https://docs.rs/olio/badge.svg)](https://docs.rs/olio)
-[![Change Log](https://img.shields.io/crates/v/olio.svg?maxAge=3600&label=change%20log&color=9cf)](https://github.com/dekellum/olio/blob/master/CHANGELOG.md)
+[![Change Log](https://img.shields.io/crates/v/olio.svg?maxAge=3600&label=change%20log&color=9cf)](https://github.com/dekellum/olio/blob/main/CHANGELOG.md)
 [![crates.io](https://img.shields.io/crates/v/olio.svg?maxAge=3600)](https://crates.io/crates/olio)
-[![CI Status](https://github.com/dekellum/olio/workflows/CI/badge.svg?branch=master)](https://github.com/dekellum/olio/actions?query=workflow%3ACI)
+[![CI Status](https://github.com/dekellum/olio/workflows/CI/badge.svg?branch=main)](https://github.com/dekellum/olio/actions?query=workflow%3ACI)
 
 Provides I/O-related utilities complimenting the Rust Standard Library
 `std::io`, `std::fs`, etc.
